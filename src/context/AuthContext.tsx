@@ -9,11 +9,17 @@ const firebaseConfig = config
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
+interface AuthContextProps {
+    user: User | null;
+}
+
 // Create the authentication context
-export const AuthContext = createContext( {} );
+export const AuthContext = createContext<AuthContextProps>( 
+    { user: null } 
+);
 
 // Custom hook to access the authentication context
-export const useAuthContext = () => useContext( AuthContext );
+export const useAuthContext = () => useContext(AuthContext);
 
 interface AuthContextProviderProps {
   children: ReactNode;
@@ -21,7 +27,7 @@ interface AuthContextProviderProps {
 
 export function AuthContextProvider( { children }: AuthContextProviderProps ): JSX.Element {
   // Set up state to track the authenticated user and loading status
-  const [ user, setUser ] = useState<User | null>( null );
+  const [ user, setUser ] = useState<User | null>(null);
   const [ loading, setLoading ] = useState( true );
 
   useEffect( () => {

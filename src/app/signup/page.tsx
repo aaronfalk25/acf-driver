@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { UserCreate } from "../interfaces";
 import { useNotificationContext } from "../../context/NotificationContext";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -11,6 +12,8 @@ export default function Signup() {
     const [lastName, setLastName] = useState("");
 
     const { snackbar } = useNotificationContext();
+
+    const router = useRouter();
 
     async function signup(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -37,20 +40,41 @@ export default function Signup() {
                 body: JSON.stringify(user),
             });
 
-            if (!signupResponse.ok) {
-                console.error('Signup failed');
-                const data = await signupResponse.json();
-                snackbar(data.message, 'error');
-            } else {
-                console.log('Signup successful');
-                snackbar('Signup successful!', 'success')
-            }
-
-            console.log("Response: ", signupResponse);
             const data = await signupResponse.json();
-            console.log("Data: ", data);
 
-        } catch (error) {
+            if (signupResponse.ok) {
+                snackbar('Signup successful!', 'success')
+            } else {
+                if (data.message === "Firebase: Error (auth/email-already-in-use).") {
+                    // Signin user
+                    snackbar(`Email already in use. Trying to sign in as ${user.email}`, 'warning');
+                    const signinResponse = await fetch('/api/signin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: user.email, password: user.password }),
+                    });
+
+                    const signinData = await signinResponse.json();
+
+                    if (signinResponse.ok) {
+                        snackbar('Signin successful!', 'success');
+                        router.push('/profile');
+                    } else {
+                        console.error('Signin failed');
+                        snackbar(signinData.message, 'error');
+                    }
+                }
+                else {
+                    console.error('Signup failed');
+                    snackbar(data.message, 'error');
+                }
+               
+            }
+            
+
+        } catch (error: any) {
             console.error('Error during signup', error);
         }
     }

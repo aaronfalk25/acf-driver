@@ -35,7 +35,7 @@ export function NotificationContextProvider({ children }: NotificationContextPro
     // Auto-hide the Snackbar after 3 seconds
     setTimeout(() => {
       setShowSnackbar(false);
-    }, 3000);
+    }, 5000);
   };
 
   return (

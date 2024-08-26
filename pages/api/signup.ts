@@ -60,9 +60,9 @@ export default async function handler(
         }
   
       } catch (error) {
-        res.status(400).json({
+        res.status(500).json({
           user: null,
-          message: 'Please fill out all fields',
+          message: 'Unknown error occurred during signup',
         });
       }
     } else {

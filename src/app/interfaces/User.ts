@@ -13,3 +13,8 @@ export interface UserCreate {
     lastName: string;
     is_admin: boolean;
 }
+
+export interface UserSignin {
+    email: string;
+    password: string;
+}
