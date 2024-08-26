@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 export function signup(userData: UserCreate): Promise<any> {
     console.log("Calling signup...");
 
-    const { email, password, firstName, lastName } = userData;
+    const { email, password, firstName, lastName, is_admin } = userData;
 
     return createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -14,6 +14,7 @@ export function signup(userData: UserCreate): Promise<any> {
                 ...user,
                 firstName,
                 lastName,
+                is_admin,
             };
         })
 }
