@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
-import { UserCreate } from "../interfaces";
-import { useNotificationContext } from "../../context/NotificationContext";
+import { useState, useEffect } from "react";
+import { UserCreate, User } from "../interfaces";
+import { useHapticsContext } from "../../providers/HapticsProvider";
 import { useRouter } from "next/navigation";
+import { useFirebase } from "@/providers/FirebaseProvider";
+import { writeData } from "@/firebase/datastore";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -11,9 +13,18 @@ export default function Signup() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
-    const { snackbar } = useNotificationContext();
+    const { snackbar } = useHapticsContext();
 
     const router = useRouter();
+
+    const { signUpWithEmailAndPassword, loginWithEmailAndPassword, user, isLoading } = useFirebase();
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            snackbar('Please sign out before signing up as a different user.', 'info');
+            router.push('/profile');
+        }
+    }, []);
 
     async function signup(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -23,56 +34,73 @@ export default function Signup() {
             return;
         }
 
+        if (!email || !password || !firstName || !lastName) {
+            snackbar("Please fill out all fields", 'error');
+            return;
+        }
+
         const user: UserCreate = {
             email,
             password,
             firstName,
             lastName,
-            is_admin: false,
+            isAdmin: false,
         }
 
         try {
-            const signupResponse = await fetch('/api/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(user),
-            });
+            const signupResponse = await signUpWithEmailAndPassword(email, password);
+            
+            if (signupResponse.success) {
+                const uid = signupResponse.uid ?? '';
+                if (uid === '') {
+                    snackbar('Signup failed', 'error');
+                    return;
+                }
 
-            const data = await signupResponse.json();
+                const datastoreUser: User = {
+                    uid,
+                    email,
+                    firstName,
+                    lastName,
+                    isAdmin: false,
+                }
 
-            if (signupResponse.ok) {
-                snackbar('Signup successful!', 'success')
-            } else {
-                if (data.message === "Firebase: Error (auth/email-already-in-use).") {
+                const writeResponse = await writeData('users', datastoreUser, uid);
+                if (writeResponse.success) {
+                    snackbar('Signup successful!', 'success');
+
+                    const signinResponse = await loginWithEmailAndPassword(email, password);
+
+                    if (signinResponse.success) {
+                        router.push('/profile');
+                    }
+                    else {
+                        router.push('/');
+                    }
+
+                    
+                }
+                else {
+                    snackbar(writeResponse.error?.toString() ?? 'Unknown signup error', 'error');
+                }
+            }
+            else {
+                if (signupResponse.error === "Firebase: Error (auth/email-already-in-use).") {
+                    
                     // Signin user
                     snackbar(`Email already in use. Trying to sign in as ${user.email}`, 'warning');
-                    const signinResponse = await fetch('/api/signin', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email: user.email, password: user.password }),
-                    });
+                    const signinResponse = await loginWithEmailAndPassword(email, password);
 
-                    const signinData = await signinResponse.json();
-
-                    if (signinResponse.ok) {
-                        snackbar('Signin successful!', 'success');
+                    if (signinResponse.success) {
                         router.push('/profile');
                     } else {
-                        console.error('Signin failed');
-                        snackbar(signinData.message, 'error');
+                        snackbar('Email already in use. Received the following error: ' + signinResponse.error ?? 'Unknown signin error', 'error');
                     }
                 }
                 else {
-                    console.error('Signup failed');
-                    snackbar(data.message, 'error');
+                    snackbar(signupResponse.error ?? 'Unknown signup error', 'error');
                 }
-               
             }
-            
 
         } catch (error: any) {
             console.error('Error during signup', error);

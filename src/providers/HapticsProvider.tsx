@@ -1,45 +1,49 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import Snackbar from '../components/Snackbar';
 
 // Define the shape of the context
-interface NotificationContextProps {
+interface HapticsContextProps {
   snackbar: (message: string, severity?: "error" | "warning" | "info" | "success") => void;
 }
 
 // Create the context with a default value
-export const NotificationContext = createContext<NotificationContextProps>({
+export const HapticsContext = createContext<HapticsContextProps>({
   snackbar: () => {},
 });
 
-export const useNotificationContext = () => useContext(NotificationContext);
+export const useHapticsContext = () => useContext(HapticsContext);
 
-interface NotificationContextProviderProps {
+interface HapticsContextProviderProps {
   children: ReactNode;
 }
 
-export function NotificationContextProvider({ children }: NotificationContextProviderProps): JSX.Element {
+export function HapticsContextProvider({ children }: HapticsContextProviderProps): JSX.Element {
   const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("info");
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const snackbar = (
     message: string,
     severity: "error" | "warning" | "info" | "success" = "error"
   ) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
     setShowSnackbar(true);
     
-    // Auto-hide the Snackbar after 3 seconds
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setShowSnackbar(false);
     }, 5000);
   };
 
   return (
-    <NotificationContext.Provider value={{ snackbar }}>
+    <HapticsContext.Provider value={{ snackbar }}>
       {children}
       {showSnackbar && (
         <Snackbar
@@ -48,6 +52,6 @@ export function NotificationContextProvider({ children }: NotificationContextPro
           onClose={() => {setShowSnackbar(false)}}
         />
       )}
-    </NotificationContext.Provider>
+    </HapticsContext.Provider>
   );
 }

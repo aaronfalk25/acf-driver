@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { app } from '@/context/AuthContext';
+import { app } from '@/providers/LayoutProvider';
 
 // Generic write to firestore
 import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
@@ -8,15 +8,17 @@ const db = getFirestore(app);
 function fnWrapper(fn: Function) {
     return async function(...args: any) {
         try {
-            await fn(...args);
+            const res = await fn(...args);
             return {
                 success: true,
-                error: null
+                error: null,
+                data: res
             }
         } catch (e) {
             return {
                 success: false,
-                error: e
+                error: e,
+                data: null
             }
         }
     }
@@ -36,26 +38,21 @@ async function _update(collection_name: string, contents: any, doc_id: string) {
 
 // Generic read entire collection
 import { getDocs } from "firebase/firestore";
-import { Collection as _Collection, Document } from "../../app/interfaces";
-async function _read(collection_name: string): Promise<_Collection> {
+import { Collection as _Collection, Document } from "../app/interfaces";
+async function _read(collection_name: string, id?: string): Promise<_Collection | Object> {
     const querySnapshot = await getDocs(collection(db, collection_name));
 
-    // Create a colleciton that will be returned that holds every document
-    const resCollection: _Collection = {
-        name: collection_name,
-        documents: []
-    }
-
-    // Loop through each document and add it to the collection
+    const data: any[] = [];
     querySnapshot.forEach((doc) => {
-        const document: Document = {
-            id: doc.id,
-            ...doc.data() 
-        }
-        resCollection.documents.push(document);
+        data.push(doc.data() as Document);
     });
 
-    return resCollection;
+    if (id) {
+        return data.filter((d: Document) => (d.id === id || d.uid === id))[0];
+    }
+    else {
+        return {[collection_name]: data} as _Collection;
+    }
 }
 
 // Delete document from firestore
@@ -68,9 +65,9 @@ async function _delete(collection_name: string, doc_id: string) {
     }
 }
 
-const write_data = fnWrapper(_write);
-const update_data = fnWrapper(_update);
-const read_data = fnWrapper(_read);
-const delete_data = fnWrapper(_delete);
+const writeData = fnWrapper(_write);
+const updateData = fnWrapper(_update);
+const readData = fnWrapper(_read);
+const deleteData = fnWrapper(_delete);
 
-export { write_data, update_data, read_data, delete_data };
+export { writeData, updateData, readData, deleteData };

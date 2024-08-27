@@ -1,9 +1,9 @@
 export interface User {
     uid: string;
-    email?: string;
-    firstName?: string;
-    lastName?: string;
-    is_admin: boolean;
+    email: string;
+    firstName: string;
+    lastName: string;
+    isAdmin: boolean;
 }
 
 export interface UserCreate {
@@ -11,10 +11,5 @@ export interface UserCreate {
     password: string;
     firstName: string;
     lastName: string;
-    is_admin: boolean;
-}
-
-export interface UserSignin {
-    email: string;
-    password: string;
+    isAdmin: boolean;
 }

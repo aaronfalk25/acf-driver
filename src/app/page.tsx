@@ -9,16 +9,16 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
+      <section>
           <h1>ACF Driver Portal</h1>
 
-          <p>Driver login</p>
-          <p>Driver signup</p>
-          <p>Driver profile</p>
+          <a href='/signin'>Driver login</a>
+          <a href='/signup'>Driver signup</a>
+          <a href='/profile'>Driver profile</a>
           <br/>
           <p>Create an event</p>
           <p>View events</p>
-      </div>
+      </section>
     </main>
   );
 }

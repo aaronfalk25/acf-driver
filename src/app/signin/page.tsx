@@ -1,18 +1,59 @@
-export default function Signin() {
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useHapticsContext } from '@/providers/HapticsProvider';
+import { useFirebase } from '@/providers/FirebaseProvider';
+
+const Signin: React.FC = () => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    
+    const router = useRouter();
+
+    const { loginWithEmailAndPassword, user, isLoading } = useFirebase();
+
+    const { snackbar } = useHapticsContext();
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            snackbar('Already logged in.', 'info');
+            router.push('/profile');
+        }
+    }, []);
+
+
+    async function signup(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        try {
+            const loginResponse = await loginWithEmailAndPassword(email, password);
+
+            if (loginResponse.success) {
+                router.push('/profile');
+            } else {
+                snackbar(loginResponse?.error ?? 'Login failed', 'error');
+            }
+        } catch (error) {
+            snackbar('Login failed', 'error');
+        }
+    }
+
     return (
-        <div>
+        <section>
             <h1>Signin</h1>
-            <form>
+            <form onSubmit={signup}>
                 <label>
                     Email:
-                    <input type="text" name="email" />
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </label>
                 <label>
                     Password:
-                    <input type="password" name="password" />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </label>
-                <button type="submit">Submit</button>
+                <button type="submit">Signin</button>
             </form>
-        </div>
+        </section>
     );
-    }
+}
+
+export default Signin;

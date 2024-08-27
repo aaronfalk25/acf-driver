@@ -4,6 +4,5 @@ export interface Document {
 }
 
 export interface Collection {
-    name: string
-    documents: Document[];
+    [name: string]: Document[];
 }
