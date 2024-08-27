@@ -8,7 +8,7 @@ export const useUser = () => {
 
     const getUser = useCallback(
         async (uid: string): Promise<User | null> => {
-            const userResponse = await readData("users", uid);
+            const userResponse = await readData("users", { uid });
 
             if (userResponse.success) {
                 return userResponse.data as User;

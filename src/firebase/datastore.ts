@@ -37,21 +37,31 @@ async function _update(collection_name: string, contents: any, doc_id: string) {
 }
 
 // Generic read entire collection
-import { getDocs } from "firebase/firestore";
+import { getDocs, query, where, CollectionReference, DocumentData } from "firebase/firestore";
 import { Collection as _Collection, Document } from "../app/interfaces";
-async function _read(collection_name: string, id?: string): Promise<_Collection | Object> {
-    const querySnapshot = await getDocs(collection(db, collection_name));
-
-    const data: any[] = [];
-    querySnapshot.forEach((doc) => {
-        data.push(doc.data() as Document);
-    });
-
+async function _read(collection_name: string, id?: { [key: string]: any }): Promise<_Collection | Object> {
     if (id) {
-        return data.filter((d: Document) => (d.id === id || d.uid === id))[0];
-    }
-    else {
-        return {[collection_name]: data} as _Collection;
+        let q = collection(db, collection_name);
+
+        for (const [field, value] of Object.entries(id)) {
+            q = query(q, where(field, "==", value)) as CollectionReference<DocumentData, DocumentData>;
+        }
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            return querySnapshot.docs[0].data() as Document;
+        }
+        else {
+            return {}
+        }
+
+    } else {
+        // If no id is provided, return all documents in the collection
+        const querySnapshot = await getDocs(collection(db, collection_name));
+        const data = querySnapshot.docs.map((doc) => doc.data() as Document);
+
+        return { [collection_name]: data } as _Collection;
     }
 }
 
