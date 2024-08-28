@@ -6,6 +6,8 @@ import { User } from '@/app/interfaces';
 import { useGetEvents } from '@/firebase/hooks/event';
 import { Event } from '@/app/interfaces';
 import Modal from '@/components/Modal';
+import EventItem from './Event';
+import ConfirmationButton from '@/components/ConfirmationButton';
 
 const Events: React.FC = () => {
     const { getCurrentUser, isLoading } = useUser();
@@ -34,11 +36,7 @@ const Events: React.FC = () => {
         <section>
             <h1>Events</h1>
             {events.map((event: Event) => (
-                <div key={event.id}>
-                    <h2>{event.title}</h2>
-                    <p>{event.description}</p>
-                    <p>{event.eventDate.toString()}</p>
-                </div>
+                <EventItem key={event.id} event={event} currentUid={user?.uid} />
             ))}
 
             {user && (

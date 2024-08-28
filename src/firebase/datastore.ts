@@ -24,24 +24,24 @@ function fnWrapper(fn: Function) {
     }
 }
 
-async function _write(collection_name: string, contents: any, doc_id: string = uuidv4()): Promise<void> {
-    const docRef = doc(collection(db, collection_name), doc_id);
+async function _write(collectionName: string, contents: any, docId: string = uuidv4()): Promise<void> {
+    const docRef = doc(collection(db, collectionName), docId);
     await setDoc(docRef, contents);
 }
 
 // Generic update id in firestore that may or may not exist
 import { updateDoc } from "firebase/firestore";
-async function _update(collection_name: string, contents: any, doc_id: string) {
-    const docRef = doc(collection(db, collection_name), doc_id);
+async function _update(collectionName: string, contents: any, docId: string) {
+    const docRef = doc(collection(db, collectionName), docId);
     await updateDoc(docRef, contents);
 }
 
 // Generic read entire collection
 import { getDocs, query, where, CollectionReference, DocumentData } from "firebase/firestore";
 import { Collection as _Collection, Document } from "../app/interfaces";
-async function _read(collection_name: string, id?: { [key: string]: any }): Promise<_Collection | Object> {
+async function _read(collectionName: string, id?: { [key: string]: any }): Promise<_Collection | Object> {
     if (id) {
-        let q = collection(db, collection_name);
+        let q = collection(db, collectionName);
 
         for (const [field, value] of Object.entries(id)) {
             q = query(q, where(field, "==", value)) as CollectionReference<DocumentData, DocumentData>;
@@ -58,18 +58,18 @@ async function _read(collection_name: string, id?: { [key: string]: any }): Prom
 
     } else {
         // If no id is provided, return all documents in the collection
-        const querySnapshot = await getDocs(collection(db, collection_name));
+        const querySnapshot = await getDocs(collection(db, collectionName));
         const data = querySnapshot.docs.map((doc) => doc.data() as Document);
 
-        return { [collection_name]: data } as _Collection;
+        return { [collectionName]: data } as _Collection;
     }
 }
 
 // Delete document from firestore
 import { deleteDoc } from "firebase/firestore";
-async function _delete(collection_name: string, doc_id: string) {
+async function _delete(collectionName: string, docId: string) {
     try {
-        await deleteDoc(doc(db, collection_name, doc_id));
+        await deleteDoc(doc(db, collectionName, docId));
     } catch (e) {
         console.error("Error deleting document: ", e);
     }

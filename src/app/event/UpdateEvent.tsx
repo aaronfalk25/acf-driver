@@ -1,33 +1,34 @@
 'use client';
 import React from 'react';
-import { useCreateEvent } from "@/firebase/hooks/event";
-import { EventCreate } from "@/app/interfaces";
+import { useUpdateEvent } from "@/firebase/hooks/event";
 import { useHapticsContext } from '@/providers/HapticsProvider';
+import { Event } from "@/app/interfaces";
 
-interface CreateEventProps {
-    uid: string;
+interface UpdateEventProps {
+    event: Event
     onComplete: () => void;
 }
 
-const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
+const UpdateEvent: React.FC<UpdateEventProps> = ({ event, onComplete }) => {
 
-    const [event, setEvent] = React.useState<EventCreate>({
-        createBy: uid,
-        title: "",
-        description: "",
-        eventDate: null,
-        eventLocation: "",
-        pickupDate: null,
-        pickupLocation: "",
+    const [updateEvent, setUpdateEvent] = React.useState<Event>({
+        id: event.id,
+        createBy: event.createBy,
+        title: event.title,
+        description: event.description,
+        eventDate: event.eventDate,
+        eventLocation: event.eventLocation,
+        pickupDate: event.pickupDate,
+        pickupLocation: event.pickupLocation,
     });
 
-    const { mutate, isLoading, isError, error } = useCreateEvent();
+    const { mutate, isLoading, isError, error } = useUpdateEvent();
 
     const { snackbar } = useHapticsContext();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setEvent({
-            ...event,
+        setUpdateEvent({
+            ...updateEvent,
             [e.target.name]: e.target.value,
         });
     };
@@ -35,27 +36,27 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!event.title || !event.eventDate || !event.eventLocation || !event.pickupDate || !event.pickupLocation) {
+        if (!updateEvent.title || !updateEvent.eventDate || !updateEvent.eventLocation || !updateEvent.pickupDate || !updateEvent.pickupLocation) {
             snackbar("Please fill out all required fields", "error");
             return;
         }
 
-        mutate(event);
+        mutate(updateEvent);
 
-        snackbar("Event created successfully", "success");
+        snackbar("Event updated successfully", "success");
         onComplete();
     };
 
     return (
         <section>
-            <h1>Create Event</h1>
+            <h1>Update Event</h1>
             <form onSubmit={handleSubmit}>
                 <label>
                     Title*
                     <input
                         type="text"
                         name="title"
-                        value={event.title}
+                        value={updateEvent.title}
                         onChange={handleChange}
                     />
                 </label>
@@ -64,7 +65,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                     <input
                         type="text"
                         name="description"
-                        value={event.description}
+                        value={updateEvent.description}
                         onChange={handleChange}
                     />
                 </label>
@@ -73,7 +74,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                     <input
                         type="datetime-local"
                         name="eventDate"
-                        value={event.eventDate ? event.eventDate.toString() : ""}
+                        value={updateEvent.eventDate ? updateEvent.eventDate.toString() : ""}
                         onChange={handleChange}
                     />
                 </label>
@@ -82,7 +83,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                     <input
                         type="text"
                         name="eventLocation"
-                        value={event.eventLocation}
+                        value={updateEvent.eventLocation}
                         onChange={handleChange}
                     />
                 </label>
@@ -91,7 +92,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                     <input
                         type="datetime-local"
                         name="pickupDate"
-                        value={event.pickupDate ? event.pickupDate.toString() : ""}
+                        value={updateEvent.pickupDate ? updateEvent.pickupDate.toString() : ""}
                         onChange={handleChange}
                     />
                 </label>
@@ -100,7 +101,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                     <input
                         type="text"
                         name="pickupLocation"
-                        value={event.pickupLocation}
+                        value={updateEvent.pickupLocation}
                         onChange={handleChange}
                     />
                 </label>
@@ -108,7 +109,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                 <p>*Required</p>
 
                 <button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Creating...' : 'Create Event'}
+                    {isLoading ? 'Updating...' : 'Update Event'}
                 </button>
                 {isError && <p>Error: {(error as any)?.message}</p>}
             </form>
@@ -117,4 +118,4 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
 }
 
 
-export default CreateEvent;
+export default UpdateEvent;
