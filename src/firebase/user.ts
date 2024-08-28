@@ -25,10 +25,7 @@ export const useUser = () => {
         return null;
     }, [user, getUser]);
 
-    const isLoading = useCallback(() => {
-        return isFirebaseLoading;
-    }
-    , [isFirebaseLoading]);
+    const isLoading = isFirebaseLoading;
 
     return {
         getUser,

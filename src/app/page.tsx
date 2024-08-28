@@ -1,12 +1,5 @@
 "use client";
 export default function Home() {
-
-  async function call_api() {
-    fetch("/api/test")
-      .then((res) => res.json())
-      .then((data) => alert(data.message));
-  }
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <section>
@@ -16,8 +9,7 @@ export default function Home() {
           <a href='/signup'>Driver signup</a>
           <a href='/profile'>Driver profile</a>
           <br/>
-          <p>Create an event</p>
-          <p>View events</p>
+          <a href="/event">Event</a>
       </section>
     </main>
   );

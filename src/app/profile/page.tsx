@@ -26,7 +26,7 @@ const Profile: React.FC = () => {
         fetchUser();
     }, [getCurrentUser]);
 
-    if (isLoading()) {
+    if (isLoading) {
         return <div>Loading...</div>;
     }
 

@@ -13,8 +13,8 @@ export interface EventCreate {
     createBy: string,
     title: string,
     description: string,
-    eventDate: Date,
+    eventDate: Date | null,
     eventLocation: string,
-    pickupDate: Date,
+    pickupDate: Date | null,
     pickupLocation: string,
 }
