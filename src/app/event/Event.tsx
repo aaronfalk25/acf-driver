@@ -6,7 +6,7 @@ import Modal from '@/components/Modal';
 import UpdateEvent from './UpdateEvent';
 import { useHapticsContext } from '@/providers/HapticsProvider';
 import { useRouter } from 'next/navigation';
-import { formatDatetime } from '../utils/dateFormatter';
+import { formatDatetime } from '../utils/date';
 import ConfirmationButton from '@/components/ConfirmationButton';
 
 interface EventProps {
@@ -36,7 +36,7 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     };
 
     return (
-        <div>
+        <div className='item'>
             <a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a>
             <p>{event.description}</p>
             <p>{formatDatetime(event.eventDate)}</p>

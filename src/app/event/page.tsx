@@ -7,13 +7,14 @@ import { useGetEvents } from '@/firebase/hooks/event';
 import { Event } from '@/app/interfaces';
 import Modal from '@/components/Modal';
 import EventItem from './Event';
-import ConfirmationButton from '@/components/ConfirmationButton';
+import { sortArrayByDate } from '@/app/utils/date';
 
 const Events: React.FC = () => {
     const { getCurrentUser, isLoading } = useUser();
 
     const [user, setUser] = useState<User | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [sortedEvents, setSortedEvents] = useState<Event[]>([]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -27,6 +28,13 @@ const Events: React.FC = () => {
     const { data, isLoading: eventsLoading } = useGetEvents();
     const events = data?.data.events;
 
+    useEffect(() => {
+        if (events) {
+            setSortedEvents(sortArrayByDate(events, 'eventDate'));
+        }
+    }, [events]);
+
+
     if (isLoading || eventsLoading) {
         return <div>Loading...</div>;
     }
@@ -35,7 +43,7 @@ const Events: React.FC = () => {
     return (
         <section>
             <h1>Events</h1>
-            {events.map((event: Event) => (
+            {sortedEvents.map((event: Event) => (
                 <EventItem key={event.id} event={event} currentUid={user?.uid} />
             ))}
 

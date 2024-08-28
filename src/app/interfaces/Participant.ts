@@ -1,4 +1,7 @@
 export interface Participant {
-    uid: string,
     eventId: string,
+    firstName: string,
+    lastName: string,
+    email?: string,
+    phoneNumber?: string,
 }
