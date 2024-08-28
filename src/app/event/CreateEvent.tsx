@@ -40,6 +40,9 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
             return;
         }
 
+        event.eventDate = new Date(event.eventDate);
+        event.pickupDate = new Date(event.pickupDate);
+
         mutate(event);
 
         snackbar("Event created successfully", "success");
