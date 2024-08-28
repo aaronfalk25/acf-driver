@@ -2,7 +2,7 @@
 import React from 'react';
 import { useUpdateEvent } from "@/firebase/hooks/event";
 import { useHapticsContext } from '@/providers/HapticsProvider';
-import { Event } from "@/app/interfaces";
+import { EventUpdate, Event } from "@/app/interfaces";
 
 interface UpdateEventProps {
     event: Event
@@ -11,14 +11,20 @@ interface UpdateEventProps {
 
 const UpdateEvent: React.FC<UpdateEventProps> = ({ event, onComplete }) => {
 
-    const [updateEvent, setUpdateEvent] = React.useState<Event>({
+    const formatDateForInput = (date: Date | string | undefined): string => {
+        if (!date) return '';
+        if (typeof date === 'string') date = new Date(date);
+        return date.toISOString().slice(0, 16);
+    };
+
+    const [updateEvent, setUpdateEvent] = React.useState<EventUpdate>({
         id: event.id,
         createBy: event.createBy,
         title: event.title,
         description: event.description,
-        eventDate: event.eventDate,
+        eventDate: formatDateForInput(event.eventDate),
         eventLocation: event.eventLocation,
-        pickupDate: event.pickupDate,
+        pickupDate: formatDateForInput(event.pickupDate),
         pickupLocation: event.pickupLocation,
     });
 
@@ -41,7 +47,10 @@ const UpdateEvent: React.FC<UpdateEventProps> = ({ event, onComplete }) => {
             return;
         }
 
-        mutate(updateEvent);
+        updateEvent.eventDate = new Date(updateEvent.eventDate);
+        updateEvent.pickupDate = new Date(updateEvent.pickupDate);
+
+        mutate(updateEvent as Event);
 
         snackbar("Event updated successfully", "success");
         onComplete();
@@ -74,7 +83,7 @@ const UpdateEvent: React.FC<UpdateEventProps> = ({ event, onComplete }) => {
                     <input
                         type="datetime-local"
                         name="eventDate"
-                        value={updateEvent.eventDate ? updateEvent.eventDate.toString() : ""}
+                        value={formatDateForInput(updateEvent.eventDate)}
                         onChange={handleChange}
                     />
                 </label>
@@ -92,7 +101,7 @@ const UpdateEvent: React.FC<UpdateEventProps> = ({ event, onComplete }) => {
                     <input
                         type="datetime-local"
                         name="pickupDate"
-                        value={updateEvent.pickupDate ? updateEvent.pickupDate.toString() : ""}
+                        value={formatDateForInput(updateEvent.pickupDate)}
                         onChange={handleChange}
                     />
                 </label>

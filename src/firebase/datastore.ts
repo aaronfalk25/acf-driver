@@ -39,6 +39,20 @@ async function _update(collectionName: string, contents: any, docId: string) {
 // Generic read entire collection
 import { getDocs, query, where, CollectionReference, DocumentData } from "firebase/firestore";
 import { Collection as _Collection, Document } from "../app/interfaces";
+import { Timestamp } from "firebase/firestore";
+function convertTimestampsToDates(data: any): any {
+    if (data instanceof Timestamp) {
+        return data.toDate();
+    } else if (Array.isArray(data)) {
+        return data.map(item => convertTimestampsToDates(item));
+    } else if (typeof data === 'object' && data !== null) {
+        return Object.fromEntries(
+            Object.entries(data).map(([key, value]) => [key, convertTimestampsToDates(value)])
+        );
+    }
+    return data;
+}
+
 async function _read(collectionName: string, id?: { [key: string]: any }): Promise<_Collection | Object> {
     if (id) {
         let q = collection(db, collectionName);
@@ -50,16 +64,16 @@ async function _read(collectionName: string, id?: { [key: string]: any }): Promi
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            return querySnapshot.docs[0].data() as Document;
-        }
-        else {
-            return {}
+            const docData = querySnapshot.docs[0].data() as Document;
+            return convertTimestampsToDates(docData);
+        } else {
+            return {};
         }
 
     } else {
         // If no id is provided, return all documents in the collection
         const querySnapshot = await getDocs(collection(db, collectionName));
-        const data = querySnapshot.docs.map((doc) => doc.data() as Document);
+        const data = querySnapshot.docs.map((doc) => convertTimestampsToDates(doc.data()) as Document);
 
         return { [collectionName]: data } as _Collection;
     }

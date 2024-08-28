@@ -22,27 +22,3 @@ export function formatDatetime(date: Date | string | null | undefined): string {
     const formatter = new Intl.DateTimeFormat('en-US', options);
     return formatter.format(date);
 }
-
-export function sortArrayByDate(array: any[] | null | undefined, key: string, order: 'asc' | 'desc' = 'asc'): any[] {
-    if (!array) {
-        return [];
-    }
-
-    array = array.map((item) => {
-        return {
-            ...item,
-            [key]: new Date(item[key])
-        }
-    });
-
-    sortArray(array, key, order);
-
-    array = array.map((item) => {
-        return {
-            ...item,
-            [key]: item[key].toISOString().slice(0, 10)
-        }
-    });
-
-    return array;
-}

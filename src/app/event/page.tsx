@@ -7,7 +7,7 @@ import { useGetEvents } from '@/firebase/hooks/event';
 import { Event } from '@/app/interfaces';
 import Modal from '@/components/Modal';
 import EventItem from './Event';
-import { sortArrayByDate } from '@/app/utils/date';
+import { sortArray } from '../utils/common';
 
 const Events: React.FC = () => {
     const { getCurrentUser, isLoading } = useUser();
@@ -30,7 +30,7 @@ const Events: React.FC = () => {
 
     useEffect(() => {
         if (events) {
-            setSortedEvents(sortArrayByDate(events, 'eventDate'));
+            setSortedEvents(sortArray([...events], 'eventDate'));
         }
     }, [events]);
 

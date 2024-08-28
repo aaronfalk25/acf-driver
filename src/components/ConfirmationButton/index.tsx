@@ -7,7 +7,7 @@ interface ConfirmationButtonProps {
     onClick?: () => void;
 }
 
-const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({ children, confirmationMessage = "Are you sure?", onClick }) => {
+const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({ children, confirmationMessage = "Confirm", onClick }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
 
     const handleConfirmationButtonPress = () => {
