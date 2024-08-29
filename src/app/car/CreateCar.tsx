@@ -31,7 +31,7 @@ const CreateCar: React.FC<CreateCarProps> = ({ uid, onComplete }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!car.description || !car.seats) {
+        if (!car.description) {
             snackbar("Please fill out all required fields", "error");
             return;
         }

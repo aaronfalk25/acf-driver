@@ -13,6 +13,7 @@ import CreateParticipant from './CreateParticipant';
 import { useGetParticipants } from '@/firebase/hooks/participant';
 import { isEmpty } from '../utils/common';
 import ParticipantItem from '../participant/Participant';
+import CreateEventCar from '../eventCar/CreateEventCar';
 
 interface EventProps {
     event: Event;
@@ -21,9 +22,12 @@ interface EventProps {
 
 const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     const [isOwner, setIsOwner] = useState(false);
+
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateParticipantModal, setShowCreateParticipantModal] = useState(false);
     const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+    const [showCreateEventCarModal, setShowCreateEventCarModal] = useState(false);
+
     const [numParticipants, setNumParticipants] = useState(0);
 
     const { mutate } = useDeleteEvent();
@@ -36,7 +40,6 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     const { data: participantsData, isLoading: participantsLoading } = useGetParticipants(event.id);
     
     useEffect(() => {
-        console.log(participantsData);
         if (participantsData && participantsData.success && !isEmpty(participantsData.data)) {
             
             setNumParticipants(participantsData.data.participants.length);
@@ -56,6 +59,8 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
         snackbar("Event deleted successfully", "success");
     };
 
+    // TODO: Add display for eventCars
+
     return (
         <div className='item'>
             <a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a>
@@ -68,6 +73,8 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
             </button>
 
             <button onClick={() => setShowCreateParticipantModal(true)}>Request a ride</button>
+
+            {currentUid && <button onClick={() => setShowCreateEventCarModal(true)}>I can drive!</button>}
 
             {isOwner && <button onClick={() => setShowEditModal(true)}>Edit</button>}
             {isOwner && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
@@ -90,6 +97,12 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
                     {participantsData && participantsData.success && !isEmpty(participantsData.data) && participantsData.data.participants.map((participant: Participant) => (
                         <ParticipantItem key={participant.id} participant={participant} />
                     ))}
+                </Modal>
+            )}
+
+            {showCreateEventCarModal && currentUid && (
+                <Modal onClose={() => setShowCreateEventCarModal(false)}>
+                    <CreateEventCar eventId={event.id} uid={currentUid} onComplete={() => setShowCreateEventCarModal(false)} />
                 </Modal>
             )}
         </div>

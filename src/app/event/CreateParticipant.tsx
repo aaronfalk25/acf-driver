@@ -26,7 +26,6 @@ const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComple
     const { snackbar } = useHapticsContext();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(participant)
         setParticipant({
             ...participant,
             [e.target.name]: e.target.value,
