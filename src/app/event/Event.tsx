@@ -1,5 +1,5 @@
 'use client'
-import { Event } from '@/app/interfaces';
+import { Event, Participant } from '@/app/interfaces';
 import React, { useEffect, useState } from 'react';
 import { useDeleteEvent } from '@/firebase/hooks/event';
 import { useDeleteParticipantByEvent } from '@/firebase/hooks/participant';
@@ -12,6 +12,7 @@ import ConfirmationButton from '@/components/ConfirmationButton';
 import CreateParticipant from './CreateParticipant';
 import { useGetParticipants } from '@/firebase/hooks/participant';
 import { isEmpty } from '../utils/common';
+import ParticipantItem from '../participant/Participant';
 
 interface EventProps {
     event: Event;
@@ -22,6 +23,7 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     const [isOwner, setIsOwner] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateParticipantModal, setShowCreateParticipantModal] = useState(false);
+    const [showParticipantsModal, setShowParticipantsModal] = useState(false);
     const [numParticipants, setNumParticipants] = useState(0);
 
     const { mutate } = useDeleteEvent();
@@ -58,10 +60,12 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
         <div className='item'>
             <a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a>
             <p>{event.description}</p>
-            <p>{formatDatetime(event.eventDate)}</p>
             
-            {/** TODO: Implement Modal for clicking Number of Participants that shows Participant object */}
+            <p>{formatDatetime(event.eventDate)}</p>
+
+            <button onClick={() => setShowParticipantsModal(true)}>
             <p>Number of participants: {numParticipants}</p>
+            </button>
 
             <button onClick={() => setShowCreateParticipantModal(true)}>Request a ride</button>
 
@@ -77,6 +81,15 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
             {showCreateParticipantModal && (
                 <Modal onClose={() => setShowCreateParticipantModal(false)}>
                     <CreateParticipant eventId={event.id} onComplete={() => setShowCreateParticipantModal(false)} />
+                </Modal>
+            )}
+
+            {showParticipantsModal && (
+                <Modal onClose={() => setShowParticipantsModal(false)}>
+                    <h1>Participants</h1>
+                    {participantsData && participantsData.success && !isEmpty(participantsData.data) && participantsData.data.participants.map((participant: Participant) => (
+                        <ParticipantItem key={participant.id} participant={participant} />
+                    ))}
                 </Modal>
             )}
         </div>

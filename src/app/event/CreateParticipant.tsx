@@ -3,6 +3,8 @@ import React from 'react';
 import { useCreateParticipant } from '@/firebase/hooks/participant';
 import { ParticipantCreate } from '@/app/interfaces';
 import { useHapticsContext } from '@/providers/HapticsProvider';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 interface CreateParticipantProps {
     eventId: string;
@@ -24,6 +26,7 @@ const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComple
     const { snackbar } = useHapticsContext();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(participant)
         setParticipant({
             ...participant,
             [e.target.name]: e.target.value,
@@ -81,13 +84,17 @@ const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComple
                     />
                 </label>
                 <label>
-                    Phone Number
-                    <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={participant.phoneNumber}
-                        onChange={handleChange}
-                    />
+                Phone Number
+                <PhoneInput
+                    country={'us'}
+                    value={participant.phoneNumber}
+                    onChange={(value, country, e, formattedValue) => 
+                        handleChange({ target: { name: 'phoneNumber', value: formattedValue } } as any)
+                      }
+                    inputProps={{
+                    name: 'phoneNumber',
+                    }}
+                />
                 </label>
                 <button type="submit" disabled={isLoading}>
                     {isLoading ? 'Processing...' : 'Request Pickup'}
