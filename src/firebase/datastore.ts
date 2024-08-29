@@ -53,7 +53,7 @@ function convertTimestampsToDates(data: any): any {
     return data;
 }
 
-async function _read(collectionName: string, id?: { [key: string]: any }): Promise<_Collection | Object> {
+async function _read(collectionName: string, id?: { [key: string]: any }, single: boolean = true): Promise<_Collection | Object> {
     if (id) {
         let q = collection(db, collectionName);
 
@@ -64,7 +64,15 @@ async function _read(collectionName: string, id?: { [key: string]: any }): Promi
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            const docData = querySnapshot.docs[0].data() as Document;
+            let docData;
+            if (single) {
+                docData = querySnapshot.docs[0].data() as Document;
+            }
+            else {
+                const data = querySnapshot.docs.map((doc) => convertTimestampsToDates(doc.data()) as Document);
+                return { [collectionName]: data } as _Collection;
+            }
+            
             return convertTimestampsToDates(docData);
         } else {
             return {};
@@ -81,9 +89,16 @@ async function _read(collectionName: string, id?: { [key: string]: any }): Promi
 
 // Delete document from firestore
 import { deleteDoc } from "firebase/firestore";
-async function _delete(collectionName: string, docId: string) {
+async function _delete(collectionName: string, docId: string, customId?: string) {
     try {
+        if (customId) {
+            const q = query(collection(db, collectionName), where(customId, "==", docId));
+            const querySnapshot = await getDocs(q);
+            const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
+        } else {
         await deleteDoc(doc(db, collectionName, docId));
+        }
     } catch (e) {
         console.error("Error deleting document: ", e);
     }

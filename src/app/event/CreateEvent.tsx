@@ -107,9 +107,6 @@ const CreateEvent: React.FC<CreateEventProps> = ({ uid, onComplete }) => {
                         onChange={handleChange}
                     />
                 </label>
-
-                <p>*Required</p>
-
                 <button type="submit" disabled={isLoading}>
                     {isLoading ? 'Creating...' : 'Create Event'}
                 </button>
