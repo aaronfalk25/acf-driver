@@ -102,7 +102,7 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
                 <Modal onClose={() => setShowParticipantsModal(false)}>
                     <h1>Participants</h1>
                     {participantsData && participantsData.success && !isEmpty(participantsData.data) && participantsData.data.participants.map((participant: Participant) => (
-                        <ParticipantItem key={participant.id} participant={participant} />
+                        <ParticipantItem key={participant.id} participant={participant} onComplete={() => {setShowParticipantsModal(false)}} />
                     ))}
                 </Modal>
             )}

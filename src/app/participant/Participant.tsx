@@ -9,10 +9,11 @@ import { isEmpty } from "../utils/common";
 
 interface ParticipantProps {
     participant: Participant;
+    onComplete: () => void;
 }
 
 
-const ParticipantItem: React.FC<ParticipantProps> = ({ participant }) => {
+const ParticipantItem: React.FC<ParticipantProps> = ({ participant, onComplete }) => {
 
     const fullName = `${participant.firstName} ${participant.lastName}`;
     const contact = [participant.email, participant.phoneNumber].filter(Boolean).join(", ");
@@ -32,6 +33,8 @@ const ParticipantItem: React.FC<ParticipantProps> = ({ participant }) => {
         updateParticipant(updatedParticipant);
 
         snackbar("Ride updated successfully", "success");
+
+        onComplete();
     }
 
     return (
