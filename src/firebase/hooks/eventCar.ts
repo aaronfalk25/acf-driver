@@ -3,15 +3,15 @@ import { readData, writeData, deleteData } from '../datastore';
 import { EventCar, EventCarCreate } from '@/app/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 
-export function useGetEventCar(eventId: string, carId: string): ReturnType<typeof useQuery> {
+export function useGetEventCar(eventId: string, carId: string) {
     return useQuery(['eventCar', eventId, carId], () => readData('eventCars', { eventId, carId }));
 }
 
-export function useGetEventCarByEvent(eventId: string): ReturnType<typeof useQuery> {
+export function useGetEventCarByEvent(eventId: string) {
     return useQuery(['eventCars', eventId], () => readData('eventCars', { eventId }, false));
 }
 
-export function useGetEventCarByCar(carId: string): ReturnType<typeof useQuery> {
+export function useGetEventCarByCar(carId: string) {
     return useQuery(['eventCars', carId], () => readData('eventCars', { carId }, false));
 }
 

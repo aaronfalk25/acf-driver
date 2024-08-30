@@ -5,6 +5,7 @@ export interface Participant {
     lastName: string,
     email: string,
     phoneNumber: string,
+    eventCarId?: string,
 }
 
 export interface ParticipantCreate {

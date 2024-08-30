@@ -1,8 +1,9 @@
 'use client'
-import { Event, Participant } from '@/app/interfaces';
+import { Event, Participant, EventCar } from '@/app/interfaces';
 import React, { useEffect, useState } from 'react';
 import { useDeleteEvent } from '@/firebase/hooks/event';
 import { useDeleteParticipantByEvent } from '@/firebase/hooks/participant';
+import { useGetEventCarByEvent, useDeleteEventCarByEvent } from '@/firebase/hooks/eventCar';
 import Modal from '@/components/Modal';
 import UpdateEvent from './UpdateEvent';
 import { useHapticsContext } from '@/providers/HapticsProvider';
@@ -14,6 +15,7 @@ import { useGetParticipants } from '@/firebase/hooks/participant';
 import { isEmpty } from '../utils/common';
 import ParticipantItem from '../participant/Participant';
 import CreateEventCar from '../eventCar/CreateEventCar';
+import EventCarItem from '../eventCar/EventCar';
 
 interface EventProps {
     event: Event;
@@ -32,12 +34,14 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
 
     const { mutate } = useDeleteEvent();
     const { mutate: deleteParticipants } = useDeleteParticipantByEvent();
+    const { mutate: deleteEventCar } = useDeleteEventCarByEvent();
 
     const { snackbar } = useHapticsContext();
 
     const router = useRouter();
 
     const { data: participantsData, isLoading: participantsLoading } = useGetParticipants(event.id);
+    const { data: eventCarData, isLoading: eventCarLoading } = useGetEventCarByEvent(event.id);
     
     useEffect(() => {
         if (participantsData && participantsData.success && !isEmpty(participantsData.data)) {
@@ -56,10 +60,9 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     const handleDelete = async () => {
         mutate(event);
         deleteParticipants(event.id);
+        deleteEventCar(event.id);
         snackbar("Event deleted successfully", "success");
     };
-
-    // TODO: Add display for eventCars
 
     return (
         <div className='item'>
@@ -78,6 +81,10 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
 
             {isOwner && <button onClick={() => setShowEditModal(true)}>Edit</button>}
             {isOwner && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
+
+            {!eventCarLoading && eventCarData && eventCarData.success && !isEmpty(eventCarData.data) && eventCarData.data.eventCars.map((eventCar: EventCar) => (
+                <EventCarItem key={eventCar.id} eventCar={eventCar} event={event} />
+            ))}
 
             {showEditModal && (
                 <Modal onClose={() => setShowEditModal(false)}>
