@@ -1,7 +1,7 @@
 'use client';
 import React from "react";
-import { EventCar, EventCarCreate, Car } from "../interfaces";
-import { useCreateEventCar } from "@/firebase/hooks/eventCar";
+import { EventCarCreate, Car } from "../interfaces";
+import { useCreateEventCar, useDeleteEventCarByUserByEvent } from "@/firebase/hooks/eventCar";
 import { useHapticsContext } from "@/providers/HapticsProvider";
 import { useGetCarsByUser } from "@/firebase/hooks/car";
 
@@ -16,9 +16,11 @@ const CreateEventCar: React.FC<CreateEventCarProps> = ({ uid, eventId, onComplet
     const [eventCar, setEventCar] = React.useState<EventCarCreate>({
         carId: "",
         eventId,
+        uid,
     });
 
-    const { mutate, isLoading, isError, error } = useCreateEventCar();
+    const { mutateAsync: createEventCar, isLoading, isError, error } = useCreateEventCar();
+    const { mutateAsync: deleteEventCar } = useDeleteEventCarByUserByEvent();
 
     const { snackbar } = useHapticsContext();
 
@@ -39,8 +41,9 @@ const CreateEventCar: React.FC<CreateEventCarProps> = ({ uid, eventId, onComplet
             return;
         }
 
-        mutate(eventCar);
-
+        await deleteEventCar({ uid, eventId });
+        await createEventCar(eventCar);
+        
         snackbar("Car added to event successfully", "success");
 
         onComplete();

@@ -57,3 +57,30 @@ export function useDeleteEventCarByCar() {
         },
     });
 }
+
+export function useDeleteEventCarByUserByEvent() {
+    const queryClient = useQueryClient();
+  
+    const fetchEventCarByUserAndEvent = async (uid: string, eventId: string) => {
+      const response = await readData('eventCars', { uid, eventId });
+      if (response.success) {
+        return response.data;
+      }
+      return null; 
+    };
+  
+    return useMutation(
+      async ({ uid, eventId }: { uid: string; eventId: string }) => {
+        const eventCar = await fetchEventCarByUserAndEvent(uid, eventId);
+        if (eventCar && eventCar.id) {
+          return await deleteData('eventCars', eventCar.id);
+        }
+        return null;
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries('eventCars');
+        },
+      }
+    );
+  }

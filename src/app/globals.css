@@ -66,3 +66,12 @@ button {
   gap: 1rem;
   width: fit-content;
 }
+
+a {
+  text-decoration: underline;
+
+  &:hover {
+    font-weight: bold;
+    cursor: pointer;
+  }
+}
