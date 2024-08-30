@@ -1,10 +1,11 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import { Car, Event, EventCar, User } from '../interfaces';
+import { Event, EventCar, User } from '../interfaces';
 import { useGetCar } from "@/firebase/hooks/car";
 import { useUser } from "@/firebase/user";
 import { useDeleteEventCar } from "@/firebase/hooks/eventCar";
 import { useHapticsContext } from "@/providers/HapticsProvider";
+import ConfirmationButton from "@/components/ConfirmationButton";
 
 interface EventCarProps {
     eventCar: EventCar;
@@ -51,7 +52,7 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event }) => {
             { driverName && <p>Driver: {driverName}</p> }
             <h2>{carData?.data.description}</h2>
             <p>{carData?.data.seats} seats</p>
-            {isOwner && <button onClick={handleDelete}>Remove Car</button>}
+            {isOwner && <ConfirmationButton onClick={handleDelete}>Remove Car</ConfirmationButton>}
         </div>
     );
 };
