@@ -14,10 +14,14 @@ const CurrentProfile: React.FC = () => {
         const fetchUser = async () => {
             const currentUser = await getCurrentUser();
             setUser(currentUser);
+            
+            if (!isLoading && !currentUser) {
+                router.push('/');
+            }
         };
 
         fetchUser();
-    }, [getCurrentUser]);
+    }, [getCurrentUser, isLoading]);
 
 
     if (isLoading) {
@@ -25,12 +29,11 @@ const CurrentProfile: React.FC = () => {
     }
 
     return (
-        <section>
-            <h1>Profile</h1>
+        <>
             { user && (
                 <Profile isCurrentUser suppliedUser={user} />
             )}
-        </section>
+        </>
     );
 }
 

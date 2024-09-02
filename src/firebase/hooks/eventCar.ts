@@ -36,6 +36,16 @@ export function useDeleteEventCar() {
     return useMutation((eventCar: EventCar) => deleteData('eventCars', eventCar.id), {
         onSuccess: () => {
             queryClient.invalidateQueries('eventCars');
+            queryClient.invalidateQueries(['participants']);
+        },
+    });
+}
+
+export function useDeleteEventCarById() {
+    const queryClient = useQueryClient();
+    return useMutation((id: string) => deleteData('eventCars', id), {
+        onSuccess: () => {
+            queryClient.invalidateQueries('eventCars');
         },
     });
 }

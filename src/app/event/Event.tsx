@@ -30,6 +30,7 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     const [showParticipantsModal, setShowParticipantsModal] = useState(false);
     const [showCreateEventCarModal, setShowCreateEventCarModal] = useState(false);
 
+    const [participants, setParticipants] = useState<Participant[]>([]);
     const [numParticipants, setNumParticipants] = useState(0);
 
     const { mutate } = useDeleteEvent();
@@ -44,9 +45,13 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     const { data: eventCarData, isLoading: eventCarLoading } = useGetEventCarByEvent(event.id);
     
     useEffect(() => {
-        if (participantsData && participantsData.success && !isEmpty(participantsData.data)) {
-            
+        if (participantsData && participantsData.success && !isEmpty(participantsData.data)) {   
+            setParticipants(participantsData.data.participants);
             setNumParticipants(participantsData.data.participants.length);
+        }
+        else {
+            setParticipants([]);
+            setNumParticipants(0);
         }
     }, [participantsData, participantsLoading])
 
@@ -83,7 +88,12 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
             {isOwner && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
 
             {!eventCarLoading && eventCarData && eventCarData.success && !isEmpty(eventCarData.data) && eventCarData.data.eventCars.map((eventCar: EventCar) => (
-                <EventCarItem key={eventCar.id} eventCar={eventCar} event={event} />
+                <EventCarItem 
+                    key={eventCar.id} 
+                    eventCar={eventCar} 
+                    event={event} 
+                    participants={participants.filter(participant => participant.eventCarId && participant.eventCarId === eventCar.id)} 
+                />
             ))}
 
             {showEditModal && (

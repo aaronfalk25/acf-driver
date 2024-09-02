@@ -1,11 +1,12 @@
 'use client';
-import React, { useEffect, useState } from "react";
-import { EventCar, Participant, Car } from "../interfaces";
-import { useUpdateParticipant } from "@/firebase/hooks/participant";
+import React, { useState } from "react";
+import { Participant, Car } from "../interfaces";
+import { useUpdateParticipant, useDeleteParticipant } from "@/firebase/hooks/participant";
+import { useDeleteEventCarById } from "@/firebase/hooks/eventCar";
 import { useGetCarsByEvent } from "@/firebase/hooks/car";
 import { useHapticsContext } from "@/providers/HapticsProvider";
-import { useGetEventCar } from "@/firebase/hooks/eventCar";
 import { isEmpty } from "../utils/common";
+import ConfirmationButton from "@/components/ConfirmationButton";
 
 interface ParticipantProps {
     participant: Participant;
@@ -22,6 +23,9 @@ const ParticipantItem: React.FC<ParticipantProps> = ({ participant, onComplete }
     const { mutate: updateParticipant } = useUpdateParticipant();
     const  { data: eventCarData, isLoading: eventCarLoading } = useGetCarsByEvent(participant.eventId);
 
+    const { mutate: deleteParticipant } = useDeleteParticipant();
+    const { mutate: deleteEventCar } = useDeleteEventCarById();
+
     const { snackbar } = useHapticsContext();
 
     const handleUpdateParticipant = (e: React.FormEvent) => {
@@ -37,9 +41,17 @@ const ParticipantItem: React.FC<ParticipantProps> = ({ participant, onComplete }
         onComplete();
     }
 
+    const handleDeleteParticipant = () => {
+        deleteParticipant(participant);
+        if (participant.eventCarId ) {
+            deleteEventCar(participant.eventCarId);
+        }
+        snackbar("Participant deleted successfully", "success");
+        onComplete();
+    }
+
     return (
         <section>
-            <h1>Participant</h1>
             <div className='item'>
                 <p>Name: {fullName}</p>
                 <p>Contact: {contact}</p>
@@ -65,6 +77,14 @@ const ParticipantItem: React.FC<ParticipantProps> = ({ participant, onComplete }
                 ) : 
                 <p>No cars available</p>
                 }
+
+
+                <ConfirmationButton
+                    onClick={handleDeleteParticipant}
+                    confirmationMessage={`Confirm - Delete ${fullName}?`}
+                > Delete Participant 
+                </ConfirmationButton>
+
 
             </div>
         </section>

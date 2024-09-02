@@ -101,17 +101,19 @@ const FirebaseProvider: FC<Props> = ({ children, auth }) => {
 
 	const resolveAuthState = useCallback(
 		async (user?: User) => {
+			setIsLoading(true);
 			if (user) {
 				const token = await getUserIdToken(user);
 				setToken(token);
 				setUser(user);
 				setIsAuthenticated(true);
+				setIsLoading(false);
 			} else {
 				setUser(undefined);
 				setIsAuthenticated(false);
 				setError(FirebaseAuthError.NONE);
+				setIsLoading(false);
 			}
-			setIsLoading(false);
 		},
 		[getUserIdToken]
 	);

@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { readData } from "./datastore";
 import { User } from "../app/interfaces";
 import { useFirebase } from "../providers/FirebaseProvider";
+import { deleteData } from "./datastore";
 
 export const useUser = () => {
     const { user, isLoading: isFirebaseLoading } = useFirebase();
@@ -25,11 +26,18 @@ export const useUser = () => {
         return null;
     }, [user, getUser]);
 
-    const isLoading = isFirebaseLoading;
+    const deleteUser = useCallback(async (uid: string): Promise<boolean> => {
+        if (uid) {
+            const response = await deleteData("users", uid);
+            return response.success;
+        }
+        return false;
+    }, []);
 
     return {
         getUser,
         getCurrentUser,
-        isLoading,
+        isLoading: isFirebaseLoading,
+        deleteUser,
     };
 };

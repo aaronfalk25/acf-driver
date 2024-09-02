@@ -10,6 +10,7 @@ export default function Home() {
           <a href='/profile'>Driver profile</a>
           <br/>
           <a href="/event">Event</a>
+          <a href="/profile">Profile</a>
       </section>
     </main>
   );

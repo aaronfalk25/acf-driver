@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import { Event, EventCar, User } from '../interfaces';
+import { Event, EventCar, Participant, User } from '../interfaces';
 import { useGetCar } from "@/firebase/hooks/car";
 import { useUser } from "@/firebase/user";
 import { useDeleteEventCar } from "@/firebase/hooks/eventCar";
@@ -10,9 +10,12 @@ import ConfirmationButton from "@/components/ConfirmationButton";
 interface EventCarProps {
     eventCar: EventCar;
     event: Event;
+    participants?: Participant[];
 }
 
-const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event }) => {
+const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event, participants }) => {
+
+    const participantsNames = participants?.map((participant) => `${participant.firstName} ${participant.lastName}`)
 
     const { data: carData, isLoading: carLoading } = useGetCar(eventCar.carId);
     const [carOwner, setCarOwner] = useState<User | undefined>(undefined);
@@ -51,8 +54,19 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event }) => {
         <div className="item">
             { driverName && <p>Driver: {driverName}</p> }
             <h2>{carData?.data.description}</h2>
-            <p>{carData?.data.seats} seats</p>
+            {participants ? carData?.data.seats - participants.length + " seats remaining" : carData?.data.seats + " seats"}
+
+            {participantsNames && 
+                <>
+                    <p>In the car:</p>
+                    <ul>
+                        {participantsNames.map((name) => <li key={name}>{name}</li>)}
+                    </ul>
+                </>
+            }
+
             {isOwner && <ConfirmationButton onClick={handleDelete}>Remove Car</ConfirmationButton>}
+
         </div>
     );
 };

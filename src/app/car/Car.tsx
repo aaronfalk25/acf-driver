@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Car, User } from "../interfaces";
 import { useDeleteCar } from "@/firebase/hooks/car";
+import { useDeleteEventCarByCar } from "@/firebase/hooks/eventCar";
 import { useHapticsContext } from "@/providers/HapticsProvider";
 import ConfirmationButton from "@/components/ConfirmationButton";
 import UpdateCar from "./UpdateCar";
@@ -15,6 +16,7 @@ interface CarProps {
 const CarItem: React.FC<CarProps> = ({ car, owner }) => {
 
     const { mutate, isError } = useDeleteCar();
+    const { mutate: deleteEventCar } = useDeleteEventCarByCar();
     const { snackbar } = useHapticsContext();
 
     const [showUpdateCarModal, setShowUpdateCarModal] = useState(false);
@@ -23,6 +25,7 @@ const CarItem: React.FC<CarProps> = ({ car, owner }) => {
 
     const handleDeleteCar = async () => {
         mutate(car);
+        deleteEventCar(car.id);
         
         if (isError) {
             snackbar("Error deleting car", "error");
