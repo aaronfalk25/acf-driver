@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useGetEvent } from '@/firebase/hooks/event';
 import { isEmpty } from '@/app/utils/common';
 import EventItem from '../Event';
-import { useUser } from '@/firebase/user';
+import { useUser } from '@/firebase/hooks/user';
 
 const EventPage: React.FC = () => {
   const { id } = useParams();

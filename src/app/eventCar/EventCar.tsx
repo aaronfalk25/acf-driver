@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Event, EventCar, Participant, User } from '../interfaces';
 import { useGetCar } from "@/firebase/hooks/car";
-import { useUser } from "@/firebase/user";
+import { useUser } from "@/firebase/hooks/user";
 import { useDeleteEventCar } from "@/firebase/hooks/eventCar";
 import { useHapticsContext } from "@/providers/HapticsProvider";
 import ConfirmationButton from "@/components/ConfirmationButton";

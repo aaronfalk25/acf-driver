@@ -65,15 +65,26 @@ button {
   background: coral;
   color: white;
   cursor: pointer;
-  max-width: 10rem;
+  max-width: max-content;
+  height: fit-content;
 }
 
 .item {
   display: flex;
+  flex-direction: column;
   padding: 0.5rem;
   border: 1px solid black;
   gap: 1rem;
   width: fit-content;
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+
+.item > .row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
 }
 
 a {
@@ -86,6 +97,7 @@ a {
 }
 
 input {
+  margin: 0 0.25rem;
   padding: 0 0.5rem;
   border: 1px solid black;
   border-radius: 0.25rem;

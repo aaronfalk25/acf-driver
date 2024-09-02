@@ -1,7 +1,7 @@
 'use client';
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from 'react';
-import { useUser } from '@/firebase/user';
+import { useUser, useGetUser } from '@/firebase/hooks/user';
 import { User, Car } from '@/app/interfaces';
 import { useFirebase } from '@/providers/FirebaseProvider';
 import { useRouter } from 'next/navigation'
@@ -10,6 +10,8 @@ import { useDeleteEventCarByCar } from "@/firebase/hooks/eventCar";
 import UserVehicles from '../UserVehicles';
 import ConfirmationButton from "@/components/ConfirmationButton";
 import { useHapticsContext } from "@/providers/HapticsProvider";
+import Modal from "@/components/Modal";
+import UpdateUser from "../UpdateUser";
 
 interface ProfileProps {
     isCurrentUser?: boolean;
@@ -23,11 +25,15 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
     const [currentUser, setCurrentUser] = useState<User | null>(isCurrentUser ? suppliedUser ?? null : null);
 
     const { getUser, isLoading, getCurrentUser, deleteUser } = useUser();
+    const { data: userData } = useGetUser(id as string); // TODO: Refactor to use useGetUser throughout code rather than useUser
+
     const { mutate: deleteCarByUser } = useDeleteCarByUser();
     const { data: carData } = useGetCarsByUser(suppliedUser?.uid ?? '');
     const { mutate: deleteEventCarByCar } = useDeleteEventCarByCar();
     const { logout, deleteAccount } = useFirebase();
     const { snackbar } = useHapticsContext();
+
+    const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
 
     const router = useRouter();
 
@@ -82,22 +88,36 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
                 <h1>Profile</h1>
                 { user && (
                     <>
-                    <div className='item'>
+                    <div className='item bg-slate-300'>
                         <p>Email: {user.email}</p>
                         <p>First Name: {user.firstName}</p>
                         <p>Last Name: {user.lastName}</p>
+
+                        {(isCurrentUser || suppliedUser?.isAdmin || true) && (
+                            <button onClick={() => setShowUpdateProfileModal(true)}>Update Profile</button>
+                        )}
                     </div>
+
 
                     <UserVehicles user={user} owner={currentUser ?? undefined} />
                     </>
                 )}
+
+
             </div>
+
 
             <div className='button-container'>
             {isCurrentUser && <button onClick={handleLogout}>Logout</button>}
 
             {isCurrentUser && <ConfirmationButton onClick={handleDeleteAccount}>Delete Account</ConfirmationButton>}
             </div>
+
+            {showUpdateProfileModal && user && currentUser &&
+                <Modal onClose={() => setShowUpdateProfileModal(false)}>
+                    <UpdateUser user={user} onComplete={() => setShowUpdateProfileModal(false)} accessAdmin={!!currentUser?.isAdmin} />
+                </Modal>
+            }
         </section>
     );
 }

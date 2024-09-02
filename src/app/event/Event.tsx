@@ -70,31 +70,46 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
     };
 
     return (
-        <div className='item'>
-            <a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a>
-            <p>{event.description}</p>
-            
-            <p>{formatDatetime(event.eventDate)}</p>
+        <div className='item bg-amber-100'>
 
-            <button onClick={() => setShowParticipantsModal(true)}>
-            <p>Number of participants: {numParticipants}</p>
-            </button>
+            <div className='row'>
+                <a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a>
+                <p>{event.description}</p>
+                
+                <p>{formatDatetime(event.eventDate)}</p>
+            </div>
 
-            <button onClick={() => setShowCreateParticipantModal(true)}>Request a ride</button>
+            <div className='row'>
 
-            {currentUid && <button onClick={() => setShowCreateEventCarModal(true)}>I can drive!</button>}
+                <button onClick={() => setShowParticipantsModal(true)}>
+                    Number of participants: {numParticipants}
+                </button>
 
-            {isOwner && <button onClick={() => setShowEditModal(true)}>Edit</button>}
-            {isOwner && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
+                <button onClick={() => setShowCreateParticipantModal(true)}>Request a ride</button>
 
-            {!eventCarLoading && eventCarData && eventCarData.success && !isEmpty(eventCarData.data) && eventCarData.data.eventCars.map((eventCar: EventCar) => (
-                <EventCarItem 
-                    key={eventCar.id} 
-                    eventCar={eventCar} 
-                    event={event} 
-                    participants={participants.filter(participant => participant.eventCarId && participant.eventCarId === eventCar.id)} 
-                />
-            ))}
+                {currentUid && <button onClick={() => setShowCreateEventCarModal(true)}>I can drive!</button>}
+
+            </div>
+
+            <div className='row'>
+
+                {isOwner && <button onClick={() => setShowEditModal(true)}>Edit</button>}
+                {isOwner && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
+
+            </div>
+
+            <div className='row'>
+
+                {!eventCarLoading && eventCarData && eventCarData.success && !isEmpty(eventCarData.data) && eventCarData.data.eventCars.map((eventCar: EventCar) => (
+                    <EventCarItem 
+                        key={eventCar.id} 
+                        eventCar={eventCar} 
+                        event={event} 
+                        participants={participants.filter(participant => participant.eventCarId && participant.eventCarId === eventCar.id)} 
+                    />
+                ))}
+
+            </div>
 
             {showEditModal && (
                 <Modal onClose={() => setShowEditModal(false)}>

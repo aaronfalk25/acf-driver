@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useUser } from '@/firebase/user';
+import { useUser } from '@/firebase/hooks/user';
 import { User } from '@/app/interfaces';
 import { useRouter } from 'next/navigation';
 import Profile from './[id]/page';

@@ -13,3 +13,9 @@ export interface UserCreate {
     lastName: string;
     isAdmin: boolean;
 }
+
+export interface UserUpdate {
+    firstName: string;
+    lastName: string;
+    isAdmin: boolean;
+}

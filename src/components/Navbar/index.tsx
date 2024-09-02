@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@/firebase/user';
+import { useUser } from '@/firebase/hooks/user';
 import { useRouter } from 'next/navigation';
 import { User } from '@/app/interfaces';
 import { useFirebase } from '@/providers/FirebaseProvider';

@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import CreateEvent from './CreateEvent';
-import { useUser } from '@/firebase/user';
+import { useUser } from '@/firebase/hooks/user';
 import { User } from '@/app/interfaces';
 import { useGetEvents } from '@/firebase/hooks/event';
 import { Event } from '@/app/interfaces';
