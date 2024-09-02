@@ -58,7 +58,7 @@ const CreateCar: React.FC<CreateCarProps> = ({ uid, onComplete }) => {
                 </label>
                 <label>
                     Seats*
-                    <p>Note: Do NOT include yourself as the driver. So if you have 5 spots, subtract 1 for yourself as the driver.</p>
+                    <p className='subtext'>Note: Do NOT include yourself as the driver. So if you have 5 spots, subtract 1 for yourself as the driver.</p>
                     <input
                         type="number"
                         name="seats"

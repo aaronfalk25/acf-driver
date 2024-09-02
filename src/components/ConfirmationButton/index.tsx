@@ -22,8 +22,8 @@ const ConfirmationButton: React.FC<ConfirmationButtonProps> = ({ children, confi
     }
 
     return (
-        <div className='flex flex-row'>
-            <button onClick={() => handleConfirmationButtonPress()}>{showConfirmation ? confirmationMessage : children}</button>
+        <div className='button-container'>
+            <button className={!showConfirmation ? 'bg-red-500': ''} onClick={() => handleConfirmationButtonPress()}>{showConfirmation ? confirmationMessage : children}</button>
             {showConfirmation && (
                 <div>
                     <button onClick={() => setShowConfirmation(false)}>Cancel</button>

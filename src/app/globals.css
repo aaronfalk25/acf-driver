@@ -65,6 +65,7 @@ button {
   background: coral;
   color: white;
   cursor: pointer;
+  max-width: 10rem;
 }
 
 .item {
@@ -88,4 +89,19 @@ input {
   padding: 0 0.5rem;
   border: 1px solid black;
   border-radius: 0.25rem;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+p {
+  padding: 0.25rem 0;
+}
+
+.subtext {
+  font-size: 0.75rem;
+  color: gray;
 }

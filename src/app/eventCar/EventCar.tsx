@@ -54,7 +54,7 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event, participants }
         <div className="item">
             { driverName && <p>Driver: {driverName}</p> }
             <h2>{carData?.data.description}</h2>
-            {participants ? carData?.data.seats - participants.length + " seats remaining" : carData?.data.seats + " seats"}
+            {participants && carData?.data ? carData?.data.seats ?? 0 - participants.length + " seats remaining" : carData?.data.seats + " seats"}
 
             {participantsNames && 
                 <>
