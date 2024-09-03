@@ -39,8 +39,6 @@ export function useGetUser(uid: string) {
 export function useGetCurrentUser() {
     const { user, isLoading } = useFirebase();
 
-    console.log("Firebase loading: ", isLoading);
-
     return useQuery(
         ['user', user?.uid],
         async () => {
