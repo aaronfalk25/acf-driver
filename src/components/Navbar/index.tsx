@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { User } from '@/app/interfaces';
 import { useFirebase } from '@/providers/FirebaseProvider';
 import { useHapticsContext } from '@/providers/HapticsProvider';
+import { isMobile } from '@/app/utils/common';
 
 import "./navbar.css"
 
@@ -28,11 +29,28 @@ const Navbar: React.FC = () => {
         router.push('/');
     }
 
+    const handleMobileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        router.push(e.target.value);
+    }
+
     return (
         <nav>
-            <a href="/">Home</a>
-            <a href="/event">Events</a>
-            <a href="/profile">Profile</a>
+            {isMobile() ? 
+                <select onChange={handleMobileChange} defaultValue="">
+                    <option value="" disabled>
+                        Menu
+                    </option>
+                    <option value="/">Home</option>
+                    <option value="/event">Events</option>
+                    <option value="/profile">Profile</option>
+                </select>
+            :
+                <>
+                <a href="/">Home</a>
+                <a href="/event">Events</a>
+                <a href="/profile">Profile</a>
+                </>
+            }
             <div>
                 {user ? (
                     <button onClick={handleLogout}>Signout</button>

@@ -15,3 +15,7 @@ export function sortArray(array: any[] | null | undefined, key: string, order: '
         }
     });
 }
+
+export function isMobile(): boolean {
+    return window.innerWidth < 768;
+}

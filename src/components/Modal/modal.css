@@ -16,8 +16,13 @@
     padding: 20px;
     border-radius: 8px;
     position: relative;
-    max-height: 90vh;
+    max-height: 80vh;
     overflow-y: auto;
+    margin-top: 55px;
+
+    @media (max-width: 768px) {
+      width: 90%;
+    }
   }
   
   .modal-close {
