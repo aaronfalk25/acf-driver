@@ -37,7 +37,10 @@ const Navbar: React.FC = () => {
                 {user ? (
                     <button onClick={handleLogout}>Signout</button>
                 ) : (
-                    <button onClick={() => router.push('/signin')}>Signin</button>
+                    <div className='button-container'>
+                    <button onClick={() => router.push('/signin')}>Sign in</button>
+                    <button onClick={() => router.push('/signup')}>Sign up</button>
+                    </div>
                 )}
             </div>
         </nav>

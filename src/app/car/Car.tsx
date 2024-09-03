@@ -38,7 +38,7 @@ const CarItem: React.FC<CarProps> = ({ car, owner }) => {
     return (
         <section>
             <h1>Car</h1>
-            <div className='item'>
+            <div className='item bg-violet-300'>
                 {owner && <p>Owner: {ownerName}</p>}
                 <p>Description: {car.description}</p>
                 <p>Seats: {car.seats}</p>

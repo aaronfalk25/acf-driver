@@ -84,7 +84,7 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
                 <h1>Profile</h1>
                 { user && (
                     <>
-                    <div className='item bg-slate-300'>
+                    <div className='item bg-emerald-400'>
                         <p>Email: {user.email}</p>
                         <p>First Name: {user.firstName}</p>
                         <p>Last Name: {user.lastName}</p>

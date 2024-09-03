@@ -109,7 +109,7 @@ export default function Signup() {
 
     return (
         <section>
-            <h1>Signup</h1>
+            <h1>Sign Up</h1>
             <form onSubmit={signup}>
                 <label>
                     Email:

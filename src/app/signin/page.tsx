@@ -40,7 +40,7 @@ const Signin: React.FC = () => {
 
     return (
         <section>
-            <h1>Signin</h1>
+            <h1>Sign In</h1>
             <form onSubmit={signup}>
                 <label>
                     Email:
