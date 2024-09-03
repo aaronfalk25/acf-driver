@@ -2,18 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { Event, EventCar, Participant, User } from '../interfaces';
 import { useGetCar } from "@/firebase/hooks/car";
-import { useUser } from "@/firebase/hooks/user";
+import { useGetUser, useGetCurrentUser } from "@/firebase/hooks/user";
 import { useDeleteEventCar } from "@/firebase/hooks/eventCar";
 import { useHapticsContext } from "@/providers/HapticsProvider";
 import ConfirmationButton from "@/components/ConfirmationButton";
 
 interface EventCarProps {
     eventCar: EventCar;
-    event: Event;
     participants?: Participant[];
 }
 
-const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event, participants }) => {
+const EventCarItem: React.FC<EventCarProps> = ({ eventCar, participants }) => {
 
     const participantsNames = participants?.map((participant) => `${participant.firstName} ${participant.lastName}`)
 
@@ -23,24 +22,22 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, event, participants }
 
     const { mutate: deleteEventCar } = useDeleteEventCar();
 
-    const { getUser, getCurrentUser } = useUser();
+    const { data: currentUserData, isLoading: isCurrentUserLoading } = useGetCurrentUser();
+    const { data: userData } = useGetUser(eventCar.uid);
+
     const { snackbar } = useHapticsContext();
 
     useEffect(() => {
-        if (carData && carData.success) {
-            getUser(carData.data.uid).then((user) => {
-                if (user) {
-                    setCarOwner(user);
-                }
-            });
-
-            getCurrentUser().then((user) => {
-                if (user) {
-                    setCurrentUser(user);
-                }
-            });
+        if (carData && carData.success && userData && userData.success) {
+            setCarOwner(userData.data);
         }
-    }, [carData]);
+    }, [carData, userData]);
+
+    useEffect(() => {
+        if (currentUserData) {
+            setCurrentUser(currentUserData.data);
+        }
+    }, [currentUserData, isCurrentUserLoading]);
 
     const driverName = carOwner ? `${carOwner.firstName} ${carOwner.lastName}` : "";
     const isOwner = currentUser && currentUser?.uid === carOwner?.uid;

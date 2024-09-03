@@ -1,7 +1,7 @@
 'use client';
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from 'react';
-import { useUser, useGetUser } from '@/firebase/hooks/user';
+import { useDeleteUser, useGetUser } from '@/firebase/hooks/user';
 import { User, Car } from '@/app/interfaces';
 import { useFirebase } from '@/providers/FirebaseProvider';
 import { useRouter } from 'next/navigation'
@@ -24,9 +24,10 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
     const [user, setUser] = useState<User | null>(suppliedUser ?? null);
     const [currentUser, setCurrentUser] = useState<User | null>(isCurrentUser ? suppliedUser ?? null : null);
 
-    const { getUser, isLoading, getCurrentUser, deleteUser } = useUser();
-    const { data: userData } = useGetUser(id as string); // TODO: Refactor to use useGetUser throughout code rather than useUser
-
+    const { data: userData, isLoading } = useGetUser(id as string);
+    const { mutate: deleteUser } = useDeleteUser();
+    const { data: currentUserData, isLoading: isCurrentLoading } = useGetUser(currentUser?.uid ?? '');
+    
     const { mutate: deleteCarByUser } = useDeleteCarByUser();
     const { data: carData } = useGetCarsByUser(suppliedUser?.uid ?? '');
     const { mutate: deleteEventCarByCar } = useDeleteEventCarByCar();
@@ -63,20 +64,15 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
 
     useEffect(() => {
         if (!suppliedUser) {
-            const fetchUser = async () => {
-                const currentUser = await getUser(id as string);
-                setUser(currentUser);
-            };
-
-            const fetchCurrentUser = async () => {
-                const currentUser = await getCurrentUser();
-                setCurrentUser(currentUser);
+            if (userData?.success && userData?.data) {
+                setUser(userData.data);
             }
-    
-            fetchUser();
-            fetchCurrentUser();
+
+            if (currentUserData?.success && currentUserData?.data) {
+                setCurrentUser(currentUserData.data);
+            }
         }
-    }, [getUser, getCurrentUser]);
+    }, [isLoading, isCurrentLoading]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -93,7 +89,7 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
                         <p>First Name: {user.firstName}</p>
                         <p>Last Name: {user.lastName}</p>
 
-                        {(isCurrentUser || suppliedUser?.isAdmin || true) && (
+                        {(isCurrentUser || suppliedUser?.isAdmin) && (
                             <button onClick={() => setShowUpdateProfileModal(true)}>Update Profile</button>
                         )}
                     </div>

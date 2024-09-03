@@ -1,4 +1,5 @@
 "use-client";
+import { useQueryClient } from 'react-query';
 
 import React, {
 	createContext,
@@ -175,6 +176,9 @@ const FirebaseProvider: FC<Props> = ({ children, auth }) => {
 				setToken("");
 				setIsAuthenticated(false);
 				setIsLoading(false);
+
+				const queryClient = useQueryClient();
+            	queryClient.invalidateQueries(['users', 'current']);
 
 				await next?.();
 			} catch (e) {

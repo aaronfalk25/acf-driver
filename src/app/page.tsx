@@ -5,12 +5,11 @@ export default function Home() {
       <section>
           <h1>ACF Driver Portal</h1>
 
-          <a href='/signin'>Driver login</a>
+          <a href='/signin'>Driver signin</a>
           <a href='/signup'>Driver signup</a>
           <a href='/profile'>Driver profile</a>
           <br/>
           <a href="/event">Event</a>
-          <a href="/profile">Profile</a>
       </section>
     </main>
   );

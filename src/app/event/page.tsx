@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import CreateEvent from './CreateEvent';
-import { useUser } from '@/firebase/hooks/user';
+import { useGetCurrentUser } from '@/firebase/hooks/user';
 import { User } from '@/app/interfaces';
 import { useGetEvents } from '@/firebase/hooks/event';
 import { Event } from '@/app/interfaces';
@@ -10,20 +10,17 @@ import EventItem from './Event';
 import { sortArray } from '../utils/common';
 
 const Events: React.FC = () => {
-    const { getCurrentUser, isLoading } = useUser();
+    const { data: currentUser, isLoading } = useGetCurrentUser();
 
     const [user, setUser] = useState<User | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [sortedEvents, setSortedEvents] = useState<Event[]>([]);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const currentUser = await getCurrentUser();
-            setUser(currentUser);
-        };
-
-        fetchUser();
-    }, [getCurrentUser]);
+        if (!isLoading && currentUser) {
+            setUser(currentUser.data);
+        }
+    }, [currentUser, isLoading]);
 
     const { data, isLoading: eventsLoading } = useGetEvents();
     const events = data?.data.events;

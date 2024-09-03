@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@/firebase/hooks/user';
+import { useGetCurrentUser } from '@/firebase/hooks/user';
 import { useRouter } from 'next/navigation';
 import { User } from '@/app/interfaces';
 import { useFirebase } from '@/providers/FirebaseProvider';
@@ -9,7 +9,7 @@ import { useHapticsContext } from '@/providers/HapticsProvider';
 import "./navbar.css"
 
 const Navbar: React.FC = () => {
-    const { getCurrentUser, isLoading } = useUser();
+    const { data: currentUser, isLoading } = useGetCurrentUser();
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
 
@@ -17,13 +17,10 @@ const Navbar: React.FC = () => {
     const { snackbar } = useHapticsContext();
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const currentUser = await getCurrentUser();
-            setUser(currentUser);
-        };
-
-        fetchUser();
-    }, [getCurrentUser, isLoading]);
+        if (currentUser && !isLoading) {
+            setUser(currentUser.data);
+        }
+    }, [currentUser, isLoading]);
 
     const handleLogout = async () => {
         await logout();

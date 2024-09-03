@@ -104,7 +104,6 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
                     <EventCarItem 
                         key={eventCar.id} 
                         eventCar={eventCar} 
-                        event={event} 
                         participants={participants.filter(participant => participant.eventCarId && participant.eventCarId === eventCar.id)} 
                     />
                 ))}

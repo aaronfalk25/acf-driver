@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useGetEvent } from '@/firebase/hooks/event';
 import { isEmpty } from '@/app/utils/common';
 import EventItem from '../Event';
-import { useUser } from '@/firebase/hooks/user';
+import { useGetCurrentUser } from '@/firebase/hooks/user';
 
 const EventPage: React.FC = () => {
   const { id } = useParams();
@@ -14,16 +14,13 @@ const EventPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
 
   const { data, isLoading } = useGetEvent(id.toString());
-  const { getCurrentUser } = useUser();
+  const { data: currentUser, isLoading: isCurrentUserLoading } = useGetCurrentUser();
 
   useEffect(() => {
-    const fetchUser = async () => {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-    };
-
-    fetchUser();
-}, [getCurrentUser]);
+    if (!isCurrentUserLoading && currentUser) {
+      setUser(currentUser.data);
+      }
+  }, [currentUser, isCurrentUserLoading]);
 
   useEffect(() => {
     if (data && data.success) {
