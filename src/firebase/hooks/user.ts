@@ -36,6 +36,34 @@ export function useGetUser(uid: string) {
     );
 }
 
+export function useGetUsers(uids: string[]) {
+    return useQuery(
+      ['users', uids.join('|')],
+      async () => {
+        if (uids.length === 0) {
+          return {};
+        }
+  
+        const users: Record<string, User> = {};
+        const userPromises = uids.map((uid: string) => readData('users', { uid }));
+        const userResponses = await Promise.all(userPromises);
+  
+        userResponses.forEach((userResponse, index) => {
+          const user = userResponses[index];
+          if (user.success) {
+            users[user.data.uid] = userResponse.data;
+          }
+        });
+  
+        return users;
+      },
+      {
+        enabled: uids.length > 0,
+      }
+    );
+  }
+  
+
 export function useGetCurrentUser() {
     const { user, isLoading } = useFirebase();
 

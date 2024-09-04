@@ -53,13 +53,13 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, participants }) => {
             <h2>{carData?.data.description}</h2>
             {participants && carData?.data ? carData?.data.seats ?? 0 - participants.length + " seats remaining" : carData?.data.seats + " seats"}
 
-            {participantsNames && 
-                <>
-                    <p>In the car:</p>
-                    <ul>
-                        {participantsNames.map((name) => <li key={name}>{name}</li>)}
+            {participantsNames && participantsNames.length > 0 && 
+                <div className='list-container'>
+                    <p className='list-header'>In the car:</p>
+                    <ul> 
+                        {participantsNames.map((name) => <li key={name}>• {name}</li>)}
                     </ul>
-                </>
+                </div>
             }
 
             {isOwner && <ConfirmationButton onClick={handleDelete}>Remove Car</ConfirmationButton>}

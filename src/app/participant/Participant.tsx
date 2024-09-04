@@ -1,9 +1,10 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Participant, Car } from "../interfaces";
 import { useUpdateParticipant, useDeleteParticipant } from "@/firebase/hooks/participant";
 import { useDeleteEventCarById } from "@/firebase/hooks/eventCar";
 import { useGetCarsByEvent } from "@/firebase/hooks/car";
+import { useGetUsers } from "@/firebase/hooks/user";
 import { useHapticsContext } from "@/providers/HapticsProvider";
 import { isEmpty } from "../utils/common";
 import ConfirmationButton from "@/components/ConfirmationButton";
@@ -23,10 +24,32 @@ const ParticipantItem: React.FC<ParticipantProps> = ({ participant, onComplete }
     const { mutate: updateParticipant } = useUpdateParticipant();
     const  { data: eventCarData, isLoading: eventCarLoading } = useGetCarsByEvent(participant.eventId);
 
+    const driverUids = useMemo(() => {
+        return eventCarData ? Object.entries(eventCarData).map(([eventCarId, car]: [string, Car]) => car.uid) : [];
+      }, [eventCarData]);
+      
+      const { data: userData } = useGetUsers(driverUids);
+
     const { mutate: deleteParticipant } = useDeleteParticipant();
     const { mutate: deleteEventCar } = useDeleteEventCarById();
 
     const { snackbar } = useHapticsContext();
+
+    const getCarName = (eventCarId: string) => {
+        const car = eventCarData && eventCarData[eventCarId];
+        const user = userData && userData[car?.uid || ""];
+
+        if (car && user) {
+            return `${car?.description} - ${user?.firstName} ${user?.lastName}`;
+        }
+        else if (car) {
+            return car.description;
+        }
+        else {
+            return "";
+        }
+        
+    }
 
     const handleUpdateParticipant = (e: React.FormEvent) => {
 
@@ -52,26 +75,23 @@ const ParticipantItem: React.FC<ParticipantProps> = ({ participant, onComplete }
 
     return (
         <section>
-            <div className='item'>
+            <div className='item w-full'>
                 <p>Name: {fullName}</p>
                 <p>Contact: {contact}</p>
 
                 {eventCarData && !isEmpty(eventCarData) ? (
-                <form onSubmit={handleUpdateParticipant}>
-                    <label>
-                        Event Car
-                        <select
-                            value={selectedEventCarId}
-                            onChange={(e) =>  setSelectedEventCarId(e.target.value)}
-                        >
-                            <option value=''>Select Car</option>
-                            {eventCarData && Object.entries(eventCarData).map(([eventCarId, car]: [string, Car]) => (
-                            <option key={eventCarId} value={eventCarId}>
-                                {car.description}
-                            </option>
-                            ))}
-                        </select>
-                    </label>
+                <form onSubmit={handleUpdateParticipant} className='min-w-max'>
+                    <select
+                        value={selectedEventCarId}
+                        onChange={(e) =>  setSelectedEventCarId(e.target.value)}
+                    >
+                        <option value=''>Select Car</option>
+                        {eventCarData && Object.entries(eventCarData).map(([eventCarId, car]: [string, Car]) => (
+                        <option key={eventCarId} value={eventCarId}>
+                            {getCarName(eventCarId)}
+                        </option>
+                        ))}
+                    </select>
                 <button type="submit" disabled={selectedEventCarId === participant.eventCarId}>Choose Car</button>
                 </form>
                 ) : 

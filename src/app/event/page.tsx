@@ -47,7 +47,7 @@ const Events: React.FC = () => {
             {user && (
                 <>
                     <button onClick={() => setShowCreateModal(true)}>Create Event</button>
-                    {showCreateModal && 
+                    {showCreateModal && user?.isAdmin &&
                         <Modal onClose={() => setShowCreateModal(false)}>
                             <CreateEvent uid={user.uid} onComplete={() => setShowCreateModal(false)} />
                         </Modal>
