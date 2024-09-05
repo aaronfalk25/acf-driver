@@ -20,8 +20,8 @@ const UserVehicles: React.FC<UserVehiclesProps> = ({ user, owner }) => {
     const [showCreateCarModal, setShowCreateCarModal] = useState(false);
 
     return (
-        <section>
-            <h1>User Vehicles</h1>
+        <section className='item bg-slate-300'>
+            <h2>User Vehicles</h2>
             {isLoading && <p>Loading...</p>}
             {isError && <p>Error</p>}
             {data && data.success && !isEmpty(data.data) && data.data.cars.map((car: _Car) => (

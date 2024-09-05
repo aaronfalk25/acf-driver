@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
     const { data: currentUser, isLoading } = useGetCurrentUser();
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
+    const [mounted, setMounted] = useState(false);
 
     const { logout } = useFirebase();
     const { snackbar } = useHapticsContext();
@@ -23,6 +24,11 @@ const Navbar: React.FC = () => {
         }
     }, [currentUser, isLoading]);
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+
     const handleLogout = async () => {
         await logout();
         snackbar("Logged out successfully", "success");
@@ -31,6 +37,10 @@ const Navbar: React.FC = () => {
 
     const handleMobileChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         router.push(e.target.value);
+    }
+
+    if (!mounted) {
+        return null
     }
 
     return (

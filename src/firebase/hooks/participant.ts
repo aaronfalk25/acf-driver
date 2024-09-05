@@ -11,13 +11,17 @@ export function useGetParticipants(eventId: string) {
     return useQuery(['participants', eventId], () => readData("participants", { eventId }, false));
 }
 
+export function useGetParticipantsByEvent(eventId: string) {
+    return useQuery(['participants', eventId], () => readData("participants", { eventId }, false));
+}
+
 export function useCreateParticipant() {
     const queryClient = useQueryClient();
 
     return useMutation(
-        (participantCreate: ParticipantCreate) => {
+        async (participantCreate: ParticipantCreate) => {
             const participant = { ...participantCreate, id: uuidv4() };
-            return writeData("participants", participant, participant.id);
+            return await writeData("participants", participant, participant.id);
         },
         {
             onSuccess: () => {

@@ -1,8 +1,11 @@
 'use client'
-import React from 'react';
+import React, { useState } from 'react';
 import { useCreateParticipant } from '@/firebase/hooks/participant';
-import { ParticipantCreate } from '@/app/interfaces';
+import { useGetCarsByEvent } from '@/firebase/hooks/car';
+import { ParticipantCreate, Participant } from '@/app/interfaces';
 import { useHapticsContext } from '@/providers/HapticsProvider';
+import SelectEventCarForm from '../participant/SelectEventCarForm';
+import Modal from '@/components/Modal';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -13,7 +16,7 @@ interface CreateParticipantProps {
 
 const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComplete }) => {
 
-    const [participant, setParticipant] = React.useState<ParticipantCreate>({
+    const [participant, setParticipant] = useState<ParticipantCreate>({
         eventId,
         firstName: "",
         lastName: "",
@@ -21,7 +24,13 @@ const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComple
         phoneNumber: "",
     });
 
-    const { mutate, isLoading, isError, error } = useCreateParticipant();
+    const [participantResponse, setParticipantResponse] = useState<Participant | null>(null);
+
+    const [showSelectEventCarFormModal, setShowSelectEventCarFormModal] = useState(false);
+
+    const { mutateAsync: createParticipant, isLoading, isError, error } = useCreateParticipant();
+
+    const { data: eventCarData } = useGetCarsByEvent(eventId);
 
     const { snackbar } = useHapticsContext();
 
@@ -45,11 +54,23 @@ const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComple
             return;
         }
 
-        mutate(participant);
+        const res = await createParticipant(participant);
+        setParticipantResponse(res.data);
 
         snackbar("Added participant!", "success");
-        onComplete();
+ 
+        if (Object.keys(eventCarData ?? {}).length > 0) {
+            setShowSelectEventCarFormModal(true);
+        }
+        else {
+            onComplete();
+        }
     };
+
+    const carSelectOnComplete = () => {
+        setShowSelectEventCarFormModal(false);
+        onComplete();
+    }
 
     return (
         <section>
@@ -100,6 +121,19 @@ const CreateParticipant: React.FC<CreateParticipantProps> = ({ eventId, onComple
                 </button>
                 {isError && <p>Error: {(error as any)?.message}</p>}
             </form>
+
+            {showSelectEventCarFormModal && participantResponse && 
+            <Modal
+                onClose={() => setShowSelectEventCarFormModal(false)}
+            >
+                <h2>Select a Car</h2>
+                <SelectEventCarForm
+                    participant={participantResponse}
+                    onComplete={carSelectOnComplete}
+                />
+            </Modal>
+            }
+                        
         </section>
     );
 };

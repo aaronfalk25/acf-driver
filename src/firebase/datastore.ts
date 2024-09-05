@@ -24,9 +24,10 @@ function fnWrapper(fn: Function) {
     }
 }
 
-async function _write(collectionName: string, contents: any, docId: string = uuidv4()): Promise<void> {
+async function _write(collectionName: string, contents: any, docId: string = uuidv4()): Promise<void | Object> {
     const docRef = doc(collection(db, collectionName), docId);
     await setDoc(docRef, contents);
+    return { id: docId, ...contents };
 }
 
 // Generic update id in firestore that may or may not exist

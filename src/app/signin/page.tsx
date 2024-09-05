@@ -16,7 +16,7 @@ const Signin: React.FC = () => {
 
     useEffect(() => {
         if (!isLoading && user) {
-            snackbar('Already logged in.', 'info');
+            snackbar('Already signed in in.', 'info');
             router.push('/profile');
         }
     }, []);
@@ -34,7 +34,7 @@ const Signin: React.FC = () => {
                 snackbar(loginResponse?.error ?? 'Login failed', 'error');
             }
         } catch (error) {
-            snackbar('Login failed', 'error');
+            snackbar('Sign in failed', 'error');
         }
     }
 
@@ -50,7 +50,7 @@ const Signin: React.FC = () => {
                     Password:
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </label>
-                <button type="submit">Signin</button>
+                <button type="submit">Sign in</button>
             </form>
         </section>
     );

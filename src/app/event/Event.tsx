@@ -81,7 +81,7 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
 
             <div className='row'>
 
-                <button onClick={() => setShowParticipantsModal(true)}>
+                <button disabled={numParticipants===0} onClick={() => setShowParticipantsModal(true)}>
                     Number of participants: {numParticipants}
                 </button>
 
@@ -99,14 +99,22 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
             </div>
 
             <div className='row'>
+                {!eventCarLoading && eventCarData && eventCarData.success && isEmpty(eventCarData.data) ? (
+                    <p>No drivers have signed up yet for this event.</p>
+                ) : (
+                    <div className='item bg-slate-300'>
+                    <h2>Cars</h2>
 
-                {!eventCarLoading && eventCarData && eventCarData.success && !isEmpty(eventCarData.data) && eventCarData.data.eventCars.map((eventCar: EventCar) => (
-                    <EventCarItem 
-                        key={eventCar.id} 
-                        eventCar={eventCar} 
-                        participants={participants.filter(participant => participant.eventCarId && participant.eventCarId === eventCar.id)} 
-                    />
-                ))}
+                    {!eventCarLoading && eventCarData && eventCarData.success && !isEmpty(eventCarData.data) && eventCarData.data.eventCars.map((eventCar: EventCar) => (
+                        <EventCarItem 
+                            key={eventCar.id} 
+                            eventCar={eventCar} 
+                            participants={participants.filter(participant => participant.eventCarId && participant.eventCarId === eventCar.id)} 
+                        />
+                    ))}
+                    </div>
+                )}
+              
 
             </div>
 
@@ -126,7 +134,11 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
                 <Modal onClose={() => setShowParticipantsModal(false)}>
                     <h1>Participants</h1>
                     {participantsData && participantsData.success && !isEmpty(participantsData.data) && participantsData.data.participants.map((participant: Participant) => (
-                        <ParticipantItem key={participant.id} participant={participant} onComplete={() => {setShowParticipantsModal(false)}} />
+                        <ParticipantItem 
+                            key={participant.id} 
+                            participant={participant} 
+                            onComplete={() => {setShowParticipantsModal(false)}} 
+                        />
                     ))}
                 </Modal>
             )}

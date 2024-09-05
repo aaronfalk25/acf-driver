@@ -17,5 +17,8 @@ export function sortArray(array: any[] | null | undefined, key: string, order: '
 }
 
 export function isMobile(): boolean {
+    if (typeof window === 'undefined') {
+        return false;
+    }
     return window.innerWidth < 768;
 }

@@ -53,7 +53,7 @@ export default function Signup() {
             if (signupResponse.success) {
                 const uid = signupResponse.uid ?? '';
                 if (uid === '') {
-                    snackbar('Signup failed', 'error');
+                    snackbar('Sign up failed', 'error');
                     return;
                 }
 
@@ -67,7 +67,7 @@ export default function Signup() {
 
                 const writeResponse = await writeData('users', datastoreUser, uid);
                 if (writeResponse.success) {
-                    snackbar('Signup successful!', 'success');
+                    snackbar('Sign up successful!', 'success');
 
                     const signinResponse = await loginWithEmailAndPassword(email, password);
 

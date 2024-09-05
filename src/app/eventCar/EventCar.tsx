@@ -41,7 +41,12 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, participants }) => {
 
     const driverName = carOwner ? `${carOwner.firstName} ${carOwner.lastName}` : "";
     const isOwner = currentUser && currentUser?.uid === carOwner?.uid;
+
+    const seats: number = carData?.data ? carData?.data.seats : 0;
+    const seatsRemaining: number = seats - (participants?.length ?? 0);
+    const seatsText = seatsRemaining == seats ? seats + ` seat${seats !== 1 ? "s" : ""}` : seatsRemaining + ` seat${seatsRemaining !== 1 ? "s" : ""} remaining`;
     
+
     const handleDelete = async () => {
         deleteEventCar(eventCar);
         snackbar("Car removed successfully", "success");
@@ -49,9 +54,11 @@ const EventCarItem: React.FC<EventCarProps> = ({ eventCar, participants }) => {
 
     return (
         <div className="item bg-violet-300">
-            { driverName && <p>Driver: {driverName}</p> }
-            <h2>{carData?.data.description}</h2>
-            {participants && carData?.data ? carData?.data.seats ?? 0 - participants.length + " seats remaining" : carData?.data.seats + " seats"}
+            <div className="row">
+                { driverName && <p>Driver: {driverName}</p> }
+                <p>Description: {carData?.data.description}</p>
+                <p>{seatsText}</p>
+            </div>
 
             {participantsNames && participantsNames.length > 0 && 
                 <div className='list-container'>
