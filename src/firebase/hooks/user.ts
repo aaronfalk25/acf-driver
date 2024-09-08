@@ -64,6 +64,15 @@ export function useGetUsers(uids: string[]) {
   }
   
 
+export function useGetAllUsers() {
+    return useQuery(
+        'users',
+        async () => {
+            return await readData('users', {}, false);
+        }
+    );
+}
+
 export function useGetCurrentUser() {
     const { user, isLoading } = useFirebase();
 
