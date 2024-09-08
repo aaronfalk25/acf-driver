@@ -40,7 +40,7 @@ const EventPage: React.FC = () => {
   return (
     <section>
       <h1>Event</h1>
-      <EventItem event={event} currentUid={user?.uid} />
+      <EventItem event={event} currentUid={user?.uid} isAdmin={user?.isAdmin || false} />
     </section>
   );
     

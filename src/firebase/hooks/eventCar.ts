@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { readData, writeData, deleteData } from '../datastore';
-import { EventCar, EventCarCreate } from '@/app/interfaces';
+import { EventCar, EventCarCreate, Participant } from '@/app/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 
 export function useGetEventCar(eventId: string, carId: string) {
@@ -31,12 +31,27 @@ export function useCreateEventCar() {
     );
 }
 
+function removeEventCarFromParticipants(eventCarId: string) {
+    return readData('participants', { eventCarId }, false).then((response) => {
+        if (response.success) {
+            const participants = response.data.participants;
+            if (!participants) return;
+            participants.forEach((participant: Participant) => {
+                writeData('participants', { ...participant, eventCarId: "" }, participant.id);
+            });
+        }
+    });
+}
+
 export function useDeleteEventCar() {
     const queryClient = useQueryClient();
     return useMutation((eventCar: EventCar) => deleteData('eventCars', eventCar.id), {
-        onSuccess: () => {
+        onSuccess: (data, variables) => {
+            const { id } = variables;
+            removeEventCarFromParticipants(id);
             queryClient.invalidateQueries('eventCars');
             queryClient.invalidateQueries(['participants']);
+            queryClient.removeQueries('carsByEvent');
         },
     });
 }
@@ -44,26 +59,59 @@ export function useDeleteEventCar() {
 export function useDeleteEventCarById() {
     const queryClient = useQueryClient();
     return useMutation((id: string) => deleteData('eventCars', id), {
-        onSuccess: () => {
+        onSuccess: (data, id) => {
+            removeEventCarFromParticipants(id);
             queryClient.invalidateQueries('eventCars');
+            queryClient.invalidateQueries(['participants']);
+            queryClient.invalidateQueries(['carsByEvent']);
         },
+    });
+}
+
+function removeEventCarFromParticipantsByEvent(eventId: string) {
+    return readData('participants', { eventId }, false).then((response) => {
+        if (response.success) {
+            const participants = response.data.participants;
+            if (!participants) return;
+            participants.forEach((participant: Participant) => {
+                writeData('participants', { ...participant, eventCarId: "" }, participant.id);
+            });
+        }
     });
 }
 
 export function useDeleteEventCarByEvent() {
     const queryClient = useQueryClient();
     return useMutation((eventId: string) => deleteData('eventCars', eventId, 'eventId'), {
-        onSuccess: () => {
+        onSuccess: (data, id) => {
+            removeEventCarFromParticipantsByEvent(id);
             queryClient.invalidateQueries('eventCars');
+            queryClient.invalidateQueries(['participants']);
+            queryClient.removeQueries('carsByEvent');
         },
+    });
+}
+
+function removeEventCarFromParticipantsByCar(carId: string) {
+    return readData('participants', { carId }, false).then((response) => {
+        if (response.success) {
+            const participants = response.data.participants;
+            if (!participants) return;
+            participants.forEach((participant: Participant) => {
+                writeData('participants', { ...participant, eventCarId: "" }, participant.id);
+            });
+        }
     });
 }
 
 export function useDeleteEventCarByCar() {
     const queryClient = useQueryClient();
     return useMutation((carId: string) => deleteData('eventCars', carId, 'carId'), {
-        onSuccess: () => {
+        onSuccess: (data, id) => {
+            removeEventCarFromParticipantsByCar(id);
             queryClient.invalidateQueries('eventCars');
+            queryClient.invalidateQueries(['participants']);
+            queryClient.removeQueries('carsByEvent');
         },
     });
 }
@@ -83,13 +131,17 @@ export function useDeleteEventCarByUserByEvent() {
       async ({ uid, eventId }: { uid: string; eventId: string }) => {
         const eventCar = await fetchEventCarByUserAndEvent(uid, eventId);
         if (eventCar && eventCar.id) {
-          return await deleteData('eventCars', eventCar.id);
+          const res = await deleteData('eventCars', eventCar.id);
+          removeEventCarFromParticipants(eventCar.id);
+          return res;
         }
         return null;
       },
       {
         onSuccess: () => {
           queryClient.invalidateQueries('eventCars');
+          queryClient.invalidateQueries(['participants']);
+          queryClient.removeQueries('carsByEvent');
         },
       }
     );

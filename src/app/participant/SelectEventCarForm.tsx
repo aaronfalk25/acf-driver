@@ -18,6 +18,8 @@ const SelectEventCarForm: React.FC<SelectEventCarFormProps> = ({ participant, on
     const { data: eventCarData } = useGetCarsByEvent(participant.eventId);
     const { mutate: updateParticipant } = useUpdateParticipant();
 
+    console.log(eventCarData);
+
     const driverUids = useMemo(() => {
         return eventCarData ? Object.entries(eventCarData).map(([eventCarId, car]: [string, Car]) => car.uid) : [];
       }, [eventCarData]);
@@ -25,6 +27,12 @@ const SelectEventCarForm: React.FC<SelectEventCarFormProps> = ({ participant, on
     const { data: userData } = useGetUsers(driverUids)
 
     const { snackbar } = useHapticsContext();
+
+    const seatsAreAvailable = () => {
+        const totalParticipantsInCar = (participants?.data.participants?.filter((participant: Participant) => participant.eventCarId && participant.eventCarId !== ""))?.length || 0;
+        const carSeats = (eventCarData && Object.values(eventCarData).reduce((acc, car) => Number(acc) + Number(car.seats), 0)) ?? 0;
+        return totalParticipantsInCar < carSeats;
+    }
 
     const getCarName = (eventCarId: string) => {
         const car = eventCarData && eventCarData[eventCarId];
@@ -68,6 +76,12 @@ const SelectEventCarForm: React.FC<SelectEventCarFormProps> = ({ participant, on
         }
 
         setSelectedEventCarId(e.target.value);
+    }
+
+    if (!seatsAreAvailable()) {
+        if (onComplete) {
+            onComplete();
+        }
     }
 
     return(

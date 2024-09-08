@@ -20,9 +20,10 @@ import EventCarItem from '../eventCar/EventCar';
 interface EventProps {
     event: Event;
     currentUid: string | undefined;
+    isAdmin: boolean;
 }
 
-const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
+const EventItem: React.FC<EventProps> = ({ event, currentUid, isAdmin }) => {
     const [isOwner, setIsOwner] = useState(false);
 
     const [showEditModal, setShowEditModal] = useState(false);
@@ -93,8 +94,8 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid }) => {
 
             <div className='row'>
 
-                {isOwner && <button onClick={() => setShowEditModal(true)}>Edit</button>}
-                {isOwner && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
+                {(isOwner || isAdmin) && <button onClick={() => setShowEditModal(true)}>Edit</button>}
+                {(isOwner || isAdmin) && <ConfirmationButton onClick={() => handleDelete()}>Delete</ConfirmationButton>}
 
             </div>
 

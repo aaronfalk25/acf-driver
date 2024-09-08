@@ -41,7 +41,7 @@ const Events: React.FC = () => {
         <section>
             <h1>Events</h1>
             {sortedEvents.map((event: Event) => (
-                <EventItem key={event.id} event={event} currentUid={user?.uid} />
+                <EventItem key={event.id} event={event} currentUid={user?.uid} isAdmin={user?.isAdmin || false}/>
             ))}
 
             {user?.isAdmin &&  (
