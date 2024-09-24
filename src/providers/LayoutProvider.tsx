@@ -16,13 +16,13 @@ export default function LayoutProvider({
 }) {
 	return (
 		<>
-			<FirebaseProvider auth={auth}>
-				<QueryProvider>
+			<QueryProvider>
+				<FirebaseProvider auth={auth}>
 					<HapticsContextProvider>
 						{children}
 					</HapticsContextProvider>
-				</QueryProvider>
-			</FirebaseProvider>
+				</FirebaseProvider>
+			</QueryProvider>
 		</>
 	);
 }

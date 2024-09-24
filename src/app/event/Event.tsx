@@ -8,7 +8,7 @@ import Modal from '@/components/Modal';
 import UpdateEvent from './UpdateEvent';
 import { useHapticsContext } from '@/providers/HapticsProvider';
 import { useRouter } from 'next/navigation';
-import { formatDatetime } from '../utils/date';
+import { formatDatetime, formatDatetimeShort } from '../utils/date';
 import ConfirmationButton from '@/components/ConfirmationButton';
 import CreateParticipant from './CreateParticipant';
 import { useGetParticipants } from '@/firebase/hooks/participant';
@@ -16,6 +16,7 @@ import { isEmpty } from '../utils/common';
 import ParticipantItem from '../participant/Participant';
 import CreateEventCar from '../eventCar/CreateEventCar';
 import EventCarItem from '../eventCar/EventCar';
+import { isMobile } from '../utils/common';
 
 interface EventProps {
     event: Event;
@@ -74,10 +75,22 @@ const EventItem: React.FC<EventProps> = ({ event, currentUid, isAdmin }) => {
         <div className='item bg-amber-100'>
 
             <div className='row'>
-                <a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a>
-                <p>{event.description}</p>
-                
-                <p>{formatDatetime(event.eventDate)}</p>
+                <h3><a onClick={() => router.push(`/event/${event.id}`)}>{event.title}</a></h3>
+            </div>
+            {event.description &&
+                <div className='row'>
+                    <p>{event.description}</p>
+                </div>
+            }   
+            <div className='row'>
+                <p>{isMobile() ? "Event:" : "Event information:"}</p>
+                <p>{isMobile() ? formatDatetimeShort(event.eventDate) : formatDatetime(event.eventDate)}</p>
+                <p>@ {event.eventLocation}</p>
+            </div>
+            <div className='row'>
+                <p>{isMobile() ? "Pickup:" : "Pickup information:"}</p>
+                <p>{isMobile() ? formatDatetimeShort(event.pickupDate) : formatDatetime(event.pickupDate)}</p>
+                <p>@ {event.pickupLocation}</p>
             </div>
 
             <div className='row'>

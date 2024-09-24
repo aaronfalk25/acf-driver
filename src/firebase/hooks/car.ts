@@ -19,6 +19,10 @@ export function useGetCarsByEvent(eventId: string) {
       if (eventCarsResponse.success && eventCarsResponse.data) {
         const eventCars = eventCarsResponse.data.eventCars;
   
+        if (!eventCars) {
+          return cars;
+        }
+
         const carPromises = eventCars.map((eventCar: EventCar) => readData('cars', { id: eventCar.carId }));
         const carResponses = await Promise.all(carPromises);
   

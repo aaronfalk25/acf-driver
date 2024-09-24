@@ -18,8 +18,6 @@ const SelectEventCarForm: React.FC<SelectEventCarFormProps> = ({ participant, on
     const { data: eventCarData } = useGetCarsByEvent(participant.eventId);
     const { mutate: updateParticipant } = useUpdateParticipant();
 
-    console.log(eventCarData);
-
     const driverUids = useMemo(() => {
         return eventCarData ? Object.entries(eventCarData).map(([eventCarId, car]: [string, Car]) => car.uid) : [];
       }, [eventCarData]);

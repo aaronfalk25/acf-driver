@@ -16,9 +16,11 @@ import UpdateUser from "../UpdateUser";
 interface ProfileProps {
     isCurrentUser?: boolean;
     suppliedUser?: User;
+    allowAdmin?: boolean;
+    logoutCallback?: () => void;
 }
 
-const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) => {
+const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser, allowAdmin=false, logoutCallback }) => {
     const { id } = useParams();
 
     const [user, setUser] = useState<User | null>(suppliedUser ?? null);
@@ -39,6 +41,10 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
     const router = useRouter();
 
     const handleLogout = async () => {
+        if (logoutCallback) {
+            logoutCallback();
+        }
+
         await logout();
         snackbar("Logged out successfully", "success");
         router.push('/');
@@ -89,7 +95,7 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
                         <p>First Name: {user.firstName}</p>
                         <p>Last Name: {user.lastName}</p>
 
-                        {(isCurrentUser || suppliedUser?.isAdmin) && (
+                        {(isCurrentUser || suppliedUser?.isAdmin || allowAdmin) && (
                             <button onClick={() => setShowUpdateProfileModal(true)}>Update Profile</button>
                         )}
                     </div>
@@ -106,7 +112,7 @@ const Profile: React.FC<ProfileProps> = ({ isCurrentUser=false, suppliedUser }) 
             <div className='button-container'>
             {isCurrentUser && <button onClick={handleLogout}>Logout</button>}
 
-            {isCurrentUser && <ConfirmationButton onClick={handleDeleteAccount}>Delete Account</ConfirmationButton>}
+            {(isCurrentUser || allowAdmin) && <ConfirmationButton onClick={handleDeleteAccount}>Delete Account</ConfirmationButton>}
             </div>
 
             {showUpdateProfileModal && user && currentUser &&

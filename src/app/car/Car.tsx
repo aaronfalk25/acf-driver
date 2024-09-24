@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Car, User } from "../interfaces";
 import { useDeleteCar } from "@/firebase/hooks/car";
 import { useDeleteEventCarByCar } from "@/firebase/hooks/eventCar";
+import { useDeleteParticipantByCar } from "@/firebase/hooks/participant";
 import { useHapticsContext } from "@/providers/HapticsProvider";
 import ConfirmationButton from "@/components/ConfirmationButton";
 import UpdateCar from "./UpdateCar";
@@ -17,6 +18,7 @@ const CarItem: React.FC<CarProps> = ({ car, owner }) => {
 
     const { mutate, isError } = useDeleteCar();
     const { mutate: deleteEventCar } = useDeleteEventCarByCar();
+    const { mutate: deleteParticipants } = useDeleteParticipantByCar();
     const { snackbar } = useHapticsContext();
 
     const [showUpdateCarModal, setShowUpdateCarModal] = useState(false);
@@ -25,7 +27,9 @@ const CarItem: React.FC<CarProps> = ({ car, owner }) => {
 
     const handleDeleteCar = async () => {
         mutate(car);
+        deleteParticipants(car.id);
         deleteEventCar(car.id);
+        
         
         if (isError) {
             snackbar("Error deleting car", "error");
@@ -35,12 +39,14 @@ const CarItem: React.FC<CarProps> = ({ car, owner }) => {
         snackbar("Car deleted successfully", "success");
     }
 
+    const plural = car.seats === 1 ? "" : "s";
+
     return (
         <section>
             <div className='item bg-violet-300'>
                 {owner && <p>Owner: {ownerName}</p>}
                 <p>Description: {car.description}</p>
-                <p>Seats: {car.seats}</p>
+                <p>Seat{plural}: {car.seats}</p>
 
                 {owner && owner.uid === car.uid && <button onClick={() => setShowUpdateCarModal(true)}>Update Car</button>}
                 {owner && owner.uid === car.uid && <ConfirmationButton onClick={handleDeleteCar}>Delete Car</ConfirmationButton>}

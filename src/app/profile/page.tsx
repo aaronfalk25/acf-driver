@@ -11,18 +11,22 @@ const CurrentProfile: React.FC = () => {
     const { data: currentUser, isLoading, isIdle } = useGetCurrentUser();
     const { snackbar } = useHapticsContext();
     const router = useRouter();
+    const [justLoggedOut, setJustLoggedOut] = useState(false);
 
     useEffect(() => {
         if (!isLoading && currentUser?.data) {
             setUser(currentUser.data);
         }
 
-        if (!isLoading && !isIdle && !currentUser?.data) {
+        if (!isLoading && !isIdle && !currentUser?.data && !justLoggedOut) {
             snackbar("Please sign in to view your profile", "error");
             router.push('/signin');
         }
     }, [currentUser, isLoading, isIdle]);
 
+    const userLogoutCallback = () => {
+        setJustLoggedOut(true);
+    }
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -31,7 +35,7 @@ const CurrentProfile: React.FC = () => {
     return (
         <>
             { user && (
-                <Profile isCurrentUser suppliedUser={user} />
+                <Profile isCurrentUser suppliedUser={user} logoutCallback={userLogoutCallback}/>
             )}
         </>
     );

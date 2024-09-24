@@ -77,6 +77,8 @@ const FirebaseProvider: FC<Props> = ({ children, auth }) => {
 	const [token, setToken] = useState<string>("");
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
+	const queryClient = useQueryClient();
+
 	const getUserIdToken = useCallback(async (user: User) => {
 		return await getIdToken(user);
 	}, []);
@@ -177,7 +179,6 @@ const FirebaseProvider: FC<Props> = ({ children, auth }) => {
 				setIsAuthenticated(false);
 				setIsLoading(false);
 
-				const queryClient = useQueryClient();
             	queryClient.invalidateQueries(['users', 'current']);
 
 				await next?.();

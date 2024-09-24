@@ -7,7 +7,8 @@ import { useFirebase } from '@/providers/FirebaseProvider';
 const Signin: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    
+
+    const [justPressedSignin, setJustPressedSignin] = useState(false);
     const router = useRouter();
 
     const { loginWithEmailAndPassword, user, isLoading } = useFirebase();
@@ -15,15 +16,15 @@ const Signin: React.FC = () => {
     const { snackbar } = useHapticsContext();
 
     useEffect(() => {
-        if (!isLoading && user) {
-            snackbar('Already signed in in.', 'info');
+        if (!isLoading && user && !justPressedSignin) {
+            snackbar('Already signed in.', 'info');
             router.push('/profile');
         }
-    }, []);
+    }, [isLoading, user]);
 
-
-    async function signup(event: React.FormEvent<HTMLFormElement>) {
+    async function signin(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        setJustPressedSignin(true);
 
         try {
             const loginResponse = await loginWithEmailAndPassword(email, password);
@@ -32,16 +33,18 @@ const Signin: React.FC = () => {
                 router.push('/profile');
             } else {
                 snackbar(loginResponse?.error ?? 'Login failed', 'error');
+                setJustPressedSignin(false);
             }
         } catch (error) {
             snackbar('Sign in failed', 'error');
+            setJustPressedSignin(false);
         }
     }
 
     return (
         <section>
             <h1>Sign In</h1>
-            <form onSubmit={signup}>
+            <form onSubmit={signin}>
                 <label>
                     Email:
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />

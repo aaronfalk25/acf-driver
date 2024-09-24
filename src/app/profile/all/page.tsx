@@ -34,7 +34,11 @@ const CurrentProfile: React.FC = () => {
         <>
             { users && (
                 users.data.users.map((user: User) => (
-                    <Profile key={user.uid} suppliedUser={user} isCurrentUser={user.uid === currentUser?.uid || currentUser?.isAdmin}/>
+                    <Profile key={user.uid} 
+                        suppliedUser={user} 
+                        isCurrentUser={user.uid === currentUser?.uid} 
+                        allowAdmin={currentUser?.isAdmin}
+                    />
                 ))
             )}
         </>
